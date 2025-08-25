@@ -11,6 +11,8 @@ from rest_framework.schemas import get_schema_view
 from django.views.generic import TemplateView as TV
 from app.defined_api.serialport import Ports
 from app.defined_api.train import Training
+from django.conf.urls.static import static
+from app import settings
 
 try:
     
@@ -62,6 +64,8 @@ template_patterns = [
     path("home/", MainView.home, name="home"),
     path("datasets/", MainView.datasets, name="datasets"),
     path("cardiologist/", MainView.cardiologist, name="cardiologist"),
+    path("prescription/<int:id>/", MainView.prescription, name="prescription"),
+    path("cardios/", MainView.cardios, name="cardios"),
     path("administration/", MainView.administration, name="administration"),
     path("patients/", MainView.patients, name="patients"),
     path("credibility/", MainView.credibility, name="credibility"),
@@ -70,4 +74,7 @@ template_patterns = [
     path("login/", MainView.login, name="login"),
 ]
 
-urlpatterns = template_patterns + api_patterns
+
+urlpatterns = template_patterns + api_patterns + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+

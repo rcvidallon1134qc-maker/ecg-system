@@ -26,9 +26,11 @@ class GatedRecurrentUnit:
 
         ensured_int = []
         for rate in sequential_data:
-            ensured_int.append(
-                int(rate)
-            )
+            if isinstance(rate, int):
+                print('True')
+                ensured_int.append(
+                    int(rate)
+                )
 
         sequential_data = ensured_int
         

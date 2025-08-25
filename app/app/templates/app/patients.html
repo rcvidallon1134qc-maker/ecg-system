@@ -193,16 +193,23 @@ new Vue({
             'PATIENT_UPDATE': false,
             'PATIENT_ID': null,
             'PREDICTION_ID': null,
-            'ACTIVE_GRAPH': null
+            'ACTIVE_GRAPH': null,
+            'NOTES': ''
         },
 
         props: {
+
             'PATIENT': {
                 "first_name": null,
                 "middle_name": '',
                 "last_name": null,
                 "birth": null
+            },
+
+            'PREDICTION' :  {
+                "recommendations": "",
             }
+
         },
 
         info: {
@@ -219,6 +226,7 @@ new Vue({
     methods: {
 
         plotJS(props) {
+      
             try {
 
                 let data = props;
@@ -250,8 +258,37 @@ new Vue({
         async viewGraph(props) {
           
             closeModal('patient_records_modal')
+            console.log(props)
+            this.state.NOTES = props.recommendations
             this.plotJS(JSON.parse(props.sequential_ecg))
+            this.state.PREDICTION_ID = props.id
             openModal('graph_modal')
+        },
+
+        async viewPrescription() {
+
+            window.location.href = '/prescription/' + String(this.state.PREDICTION_ID) + '/'
+
+            this.props.PREDICTION.recommendations = ''
+            this.state.PREDICTION_ID = null
+            this.state.NOTES = ''
+            closeModalw('graph_modal')
+            
+        },
+
+        async updatePrescription() {
+            const url = '/get-update-destroy/prediction/'
+            this.props.PREDICTION.recommendations = this.state.NOTES
+
+            const result = await universalPatch(this, 'GET_UPDATE_DESTROY', 
+                'PREDICTION', 'PREDICTION', 'PREDICTION', 
+                'PREDICTION_ID', 'PREDICTION')
+
+            this.props.PREDICTION.recommendations = ''
+            this.state.PREDICTION_ID = null
+            this.state.NOTES = ''
+            closeModalw('graph_modal')
+            
         },
 
         async viewPatientRecords(props) {

@@ -20,8 +20,11 @@ class TemplateView:
 
         if not request.user.is_authenticated:
             return redirect("login")
-
-        return Templates.HOME.render_page(request)
+        
+        from app.data.reports import GetReports
+        report = GetReports()
+        
+        return Templates.HOME.addContext(report.get_reports()).render_page(request)
 
     def datasets(self, request):
         """Renders the datasets page."""
@@ -37,12 +40,16 @@ class TemplateView:
         """Renders the cardiologist page."""
 
         assert isinstance(request, HttpRequest)
-
+        
         if not request.user.is_authenticated:
             return redirect("login")
 
-        return Templates.PATIENTS.render_page(request)
-    
+        # Make sure it's Cardiologist.
+        if not request.user.is_superuser:
+            return Templates.PATIENTS.render_page(request)
+        else:
+            return redirect('home')
+        
     def administration(self, request):
         """Renders the admin defined page."""
 
@@ -50,8 +57,27 @@ class TemplateView:
 
         if not request.user.is_authenticated:
             return redirect("login")
+        
+        # Make sure it's Admin.
+        if request.user.is_superuser:
+            return Templates.ADMINISTRATION.render_page(request)
+        else:
+            return redirect('home')
 
-        return Templates.ADMINISTRATION.render_page(request)
+    def prescription(self, request, id):
+        """Renders the prescription defined page."""
+
+        assert isinstance(request, HttpRequest)
+
+        if not request.user.is_authenticated:
+            return redirect("login")
+        
+        from app.data.prediction_records import PredictionObject
+
+        predictions = PredictionObject()
+        prescriptions = predictions.get_records(id)
+
+        return Templates.PRESCRIPTION.addContext(prescriptions).render_page(request)
 
     def cardiologist(self, request):
         """Renders the cardiologist page."""
@@ -61,7 +87,25 @@ class TemplateView:
         if not request.user.is_authenticated:
             return redirect("login")
 
-        return Templates.CARDIOLOGIST.render_page(request)
+        # Make sure it's Cardiologist.
+        if not request.user.is_superuser:
+            return Templates.CARDIOLOGIST.render_page(request)
+        else:
+            return redirect('home')
+    
+    def cardios(self, request):
+        """Renders the cardiologist page."""
+
+        assert isinstance(request, HttpRequest)
+
+        if not request.user.is_authenticated:
+            return redirect("login")
+
+        # Make sure it's Cardiologist.
+        if not request.user.is_superuser:
+            return Templates.CARDIOS.render_page(request)
+        else:
+            return redirect('home')
 
     def credibility(self, request):
         """Renders the credibility page."""

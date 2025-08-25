@@ -1,0 +1,257 @@
+{% extends "app/layout.html" %}
+{% load static %}
+{% block content %}
+
+<div id="{{ obj_name }}">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="display-6 fw-bold">
+                <i class="fa-solid fa-user"></i> Cardiologist's Profile
+            </h1>
+
+            <p class="lead fw-bold text-muted">
+                Here you can manage the cardiologist's profile.
+            </p>
+
+            <div class="card mb-3">
+                <div class="card-body">
+                    <label class="label mb-3">Name: *</label>
+                    <input v-if="props.USER" type="text"
+                        v-model="props.USER.user.first_name"
+                        class="form-control"
+                        disabled>
+
+                    <label class="label mb-3">Last Name: *</label>
+                    <input v-if="props.USER" type="text"
+                        v-model="props.USER.user.last_name"
+                        class="form-control mb-3" disabled>
+
+                    <label class="label mb-3">Suffixes: (Optional)</label>
+                    <input v-if="props.USER" v-model="props.USER.suffixes"
+                        type="text" class="form-control mb-3">
+
+                    <button class="btn btn-secondary w-100 mb-3"
+                        @click="updateSuffix()">
+                        Update Suffix
+                    </button>
+
+                    <label class="label mb-3">Current Signature:</label><br>
+                    <img v-if="props.USER" :src="props.USER.e_signature"
+                        class="img-fluid">
+                    <div class="mb-3">
+                        <label for="formFile" class="form-label">Upload
+                            Signature: *</label>
+                        <input class="form-control" v-model="fileUpload"
+                            type="file" id="fileInput">
+                    </div>
+
+                    <button class="btn btn-primary w-100 mb-3"
+                        @click="updateSignature()">
+                        Update Signature
+                    </button>
+
+                </div>
+            </div>
+
+            <!-- <h1 class="display-6 fw-bold">
+                <i class="fa-solid fa-user"></i> Cardiologist's Patient(s)
+            </h1>
+
+            <p class="lead fw-bold text-muted">
+                These are the list of Cardiologist's Patient(s) as attending
+                physician.
+            </p>
+
+            <div class="card">
+                <div class="card-body">
+                        <table class="table" v-if="lists.PREDICTION.results">
+             
+                            <thead>
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Full Name</th>
+                                    <th scope="col">Option(s)</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr v-for="patient in lists.PREDICTION.results">
+                                    <td>
+                                        [[ patient.id ]]
+                                    </td>
+
+                                    <td>
+                                        [[ patient.patient.first_name ]] [[ patient.patient.middle_name ]] 
+                                        [[ patient.patient.last_name ]]
+                                    </td>
+
+                                    <td>
+                                        <button class="btn btn-success" @click="viewPrescription(patient.id)">
+                                            View Record / Prescription
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                     
+
+                        </table>
+
+                        <div v-if="lists.PREDICTION"
+                            class="d-flex justify-content-end mt-2">
+                            <button class="btn btn-primary me-2"
+                                :disabled="lists.PREDICTION.previous === null"
+                                @click="switchPage('PREVIOUS')">
+                                <i class="fa-solid fa-left"></i> Previous
+                            </button>
+                            <button class="btn btn-primary me-2"
+                                :disabled="lists.PREDICTION.next === null"
+                                @click="switchPage('NEXT')">
+                                Next <i class="fa-solid fa-right"></i>
+                            </button>
+                        </div>
+
+                    </div>
+
+            </div> -->
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+new Vue({
+    delimiters: ["[[", "]]"],
+    el: "#" + '{{ obj_name }}',
+    data: {
+        fileUpload: null,
+        lists: {},
+        url_models: {},
+        loading_state: {},
+        endpoints: {},
+        info: { MESSAGE: '', TITLE: '' },
+        state: {
+            'USER_ID': '{{ user.id }}',
+            'PATIENT_UPDATE': false,
+            'PATIENT_ID': null,
+            'PREDICTION_ID': null,
+            'ACTIVE_GRAPH': null
+        },
+        props: {
+            'USER': null,
+            'PATIENT': {
+                "first_name": null,
+                "middle_name": '',
+                "last_name": null,
+                "birth": null
+            }
+        }
+    },
+    computed: {},
+    mounted() {
+
+        if (document.querySelector("#" + '{{ obj_name }}')) {
+            console.log("Mounted " + '{{ obj_name }}' + " page.")
+        }
+        initializeModels(this, ['CARDIOLOGIST', 'USER', 'PATIENT', 'PREDICTION'])
+        universalGet(this, 'LIST_GET', 'PREDICTION', 'PREDICTION', 'PREDICTION', {page: 1, attending_physician: 1})
+        this.getUserDetails()
+
+    },
+
+    methods: {
+
+    async switchPage (option) {
+
+            var action = ''
+            if (option === 'NEXT') {
+                action = this.lists.PREDICTION.next
+            } else if (option === 'PREVIOUS') {
+                action = ensurePageParam(this.lists.PREDICTION.previous )
+            }
+
+            await universalGet(this, 
+                'LIST_GET', 
+                'PREDICTION', 
+                'PREDICTION', 
+                'PREDICTION', 
+                null,
+                action)
+        },
+
+    // Object Calls.
+     viewPrescription(id) {
+        window.location.href = "/prescription/" + String(id) + "/"
+     },
+     async updateSignature() {
+                const csrftoken = getCookie("csrftoken");
+                axios.defaults.headers.common["X-CSRFToken"] = csrftoken;
+
+                const form_data = new FormData();
+                form_data.append('image', this.fileUpload)
+
+                // Append the selected file to the FormData object
+                const fileInput = document.getElementById('fileInput'); // Assuming you have an input element with id 'fileInput'
+                const file = fileInput.files[0]; // Get the first file selected by the user
+                form_data.append('e_signature', file);
+            
+            const url = "/api/get-update-destroy/cardiologist/" + String(this.props.USER.id) + "/"
+            await axios
+                .patch(url, form_data)
+                .then((response) => {
+                    console.log(response)
+
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+
+            await this.getUserDetails()
+            fileInput.files[0] = null
+                
+            },
+
+        async getUserDetails() {
+            const result = await universalGet(this, 'LIST_GET', 'CARDIOLOGIST', 'CARDIOLOGIST', 'CARDIOLOGIST', {user: this.state.USER_ID})
+            if (result) {
+                this.props.USER = result.data[0]
+            }
+        },
+
+        async getCardiologistDetails() {
+            const result = await universalGet(this, 'LIST_GET', 'CARDIOLOGIST', 'CARDIOLOGIST', 'CARDIOLOGIST', {id: this.state.USER_ID})
+            if (result) {
+                this.props.USER = result.data[0]
+            }
+        },
+
+        async updateSuffix() {
+            
+            const csrftoken = getCookie("csrftoken");
+            axios.defaults.headers.common["X-CSRFToken"] = csrftoken;
+
+            const url = "/api/get-update-destroy/cardiologist/" + String(this.props.USER.id) + "/"
+            console.log(this.props.USER.suffixes)
+            const result = await axios
+                .patch(url, {
+                    'suffixes': this.props.USER.suffixes
+                })
+                .then((response) => {
+                    console.log(response)
+
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+
+            // await this.getUserDetails()
+
+
+        }
+
+
+    },
+});
+</script>
+{% endblock %}

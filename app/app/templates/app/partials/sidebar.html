@@ -16,37 +16,56 @@
             <li class="nav-item">
                 <a class="nav-link fw-normal text-muted"
                     href="{% url 'home' %}">
-                    <i class="fa-solid fa-icons p-3"></i>Home
+                    <i class="fa-solid fa-house p-3"></i>Home
                 </a>
             </li>
 
+            {% if request.user.is_superuser %}
             <li class="nav-item">
                 <a class="nav-link fw-normal text-muted"
                     href="{% url 'datasets' %}">
-                    <i class="fa-solid fa-icons p-3"></i>Datasets
+                    <i class="fa-solid fa-database p-3"></i>Datasets
                 </a>
             </li>
+            {% endif %}
 
+            {% if not request.user.is_superuser %}
             <li class="nav-item">
                 <a class="nav-link fw-normal text-muted"
                     href="{% url 'cardiologist' %}">
-                    <i class="fa-solid fa-icons p-3"></i>Read ECG
+                    <i class="fa-solid fa-heart p-3"></i>Read ECG
                 </a>
             </li>
+            {% endif %}
 
+            {% if not request.user.is_superuser %}
             <li class="nav-item">
                 <a class="nav-link fw-normal text-muted"
                     href="{% url 'patients' %}">
-                    <i class="fa-solid fa-icons p-3"></i>Patients
+                    <i class="fa-solid fa-users-medical p-3"></i>Patients
                 </a>
             </li>
+            {% endif %}
 
+            {% if request.user.is_superuser %}
             <li class="nav-item">
                 <a class="nav-link fw-normal text-muted"
                     href="{% url 'administration' %}">
-                    <i class="fa-solid fa-icons p-3"></i>Admin Panel / User(s)
+                    <i class="fa-solid fa-user-tie p-3"></i>Admin Panel /
+                    User(s)
                 </a>
             </li>
+            {% endif %}
+
+            {% if not request.user.is_superuser %}
+            <li class="nav-item">
+                <a class="nav-link fw-normal text-muted"
+                    href="{% url 'cardios' %}">
+                    <i class="fa-solid fa-user-doctor p-3"></i>Cardiologist's
+                    Panel
+                </a>
+            </li>
+            {% endif %}
 
             <li class="nav-item">
                 <a class="nav-link fw-normal text-muted"

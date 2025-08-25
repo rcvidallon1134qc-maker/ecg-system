@@ -84,6 +84,7 @@ class Prediction(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null = True)
     sequential_ecg = models.TextField(default = None, null = False)
     remarks = models.TextField(default = None, null = False)
+    recommendations = models.TextField(default = None, null = True)
 
 class ModelInfo(models.Model):
 

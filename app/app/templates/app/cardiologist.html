@@ -38,6 +38,11 @@
                         ECG
                         Data
                     </button>
+
+                    <!-- <button class="btn btn-primary w-100 mb-2"
+                        @click="testWS()">Test Web Socket
+                    </button> -->
+
                 </div>
             </div>
 
@@ -194,6 +199,9 @@ new Vue({
             
             SELECTED_PATIENT: false,
             SELECTED_FILE: null,
+            COUNTER: 0,
+            X_VALUES: [],
+            Y_VALUES: []
         }
 
     },
@@ -208,9 +216,15 @@ new Vue({
         });
 
         this.getPorts()
+
         Vue.set(this.lists, 'PORTS', [])
         Vue.set(this.info, 'STATE', false)
         Vue.set(this.props, 'PREDICTION', {})
+        
+        setInterval(() => {
+            this.state.COUNTER = this.state.COUNTER + 1
+        }, 3000)
+
     },
     methods: {
 
@@ -331,14 +345,87 @@ new Vue({
             } catch (error) {}
 
         },
+        
+        async testWS() {
+            // Vue Way
+            // Initialize Websocket
+            const ws = new WebSocket("ws://localhost:8080/ws/some_path/");
+
+            // Timeout variable
+            let closeTimeout;
+
+            // Function to reset the timeout
+            const resetTimeout = () => {
+                if (closeTimeout) clearTimeout(closeTimeout);
+                closeTimeout = setTimeout(() => {
+                    console.log("⌛ No messages received in 10 seconds. Closing WebSocket.");
+                    ws.close();
+                }, 10000); // 10 seconds
+            };
+
+            ws.onopen = () => {
+                console.log("✅ WebSocket connected!");
+                resetTimeout(); // start the timeout on connection
+            };
+
+            ws.onmessage = (event) => {
+                resetTimeout();
+
+                try {
+
+                    let data = JSON.parse(event.data);
+                    let value = parseInt(data.message);
+                    this.state.Y_VALUES.push(value)
+                    this.state.COUNTER = this.state.COUNTER + 1
+                    this.state.X_VALUES.push(this.state.COUNTER)
+
+                    let trace = {
+
+                        x: this.state.X_VALUES,
+                        y: this.state.Y_VALUES,
+
+                        mode: 'lines',
+                        line: { color: 'blue' }
+                    };
+
+                    let layout = {
+                        title: 'ECG-Style Graph',
+                        xaxis: { title: 'Time' },
+                        yaxis: { title: 'Amplitude' }
+                    };
+
+                    if (this.state.COUNTER > 50) {
+                        this.state.COUNTER = 0
+                        this.state.X_VALUES = []
+                        this.state.Y_VALUES = []
+                    }
+
+                    Plotly.newPlot('chart-graph', [trace], layout);
+
+                } catch (e) {
+                    console.error("⚠️ Invalid WS message:", event.data, e);
+                }
+
+            };
+
+            ws.onclose = () => {
+                console.log("❌ WebSocket disconnected!");
+                this.info.STATE = false
+                closeModal('loading_message_modal')
+            };
+
+        },
+
         async plotJS() {
+
             try {
 
                 this.info.STATE = true
                 this.info.TITLE = 'Notification'
                 this.info.MESSAGE = 'Reading ECG Data'
+                
                 openModal('loading_message_modal')
-
+                await this.testWS()
 
                 axios.defaults.headers.common['X-CSRFToken'] = getCookie('csrftoken')
 
@@ -349,6 +436,9 @@ new Vue({
 
                 let response = await axios.post('/api/serial-ports/', payload);
                 let data = response.data;
+
+                console.log(data)
+                console.log('is the response.')
 
                 this.props.PREDICTION.id = response.data.prediction_id
 
@@ -376,6 +466,7 @@ new Vue({
                 };
 
                 Plotly.newPlot('ecg-graph', [trace], layout);
+
             } catch (error) {
                 console.error("Error fetching ECG data:", error);
             }

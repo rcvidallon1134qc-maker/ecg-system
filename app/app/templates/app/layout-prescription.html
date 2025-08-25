@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Prescription - My Django Application</title>
+
+        {% load static %}
+        <link rel="icon" href="{% static 'app/favicon.ico' %}"
+            type="image/x-icon">
+        <link rel="stylesheet"
+            href="{% static 'app/bulma/css/bulma.min.css' %}">
+        <link rel="stylesheet"
+            href="{% static 'app/user-defined/css/customized.css' %}">
+        <link rel="stylesheet"
+            href="{% static 'app/user-defined/css/animations.css' %}">
+        <link rel="stylesheet" href="{% static 'app/fa/css/all.css' %}">
+        <link rel="stylesheet"
+            href="{% static 'app/datatables/datatables.min.css' %}">
+
+        <script src="{% static 'app/jquery/jquery-3.6.0.min.js' %}"></script>
+        <script src="{% static 'app/user-defined/js/modal.js' %}"
+            defer></script>
+        <script src="{% static 'app/datatables/datatables.min.js' %}"
+            async></script>
+
+        <script src="{% static 'app/scripts/vue.min.js' %}"></script>
+        <script src="{% static 'app/scripts/axios.min.js' %}"></script>
+
+    </head>
+
+    <body>
+
+        <div class="container">
+            <div class="section p-2">
+                <div class="content pl-4 pr-4 pt-3 mb-4">
+
+                    {% block content %}
+
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+
+        {% block scripts %}
+
+        {% endblock %}
+
+    </body>
+
+</html>

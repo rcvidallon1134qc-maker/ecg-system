@@ -13,6 +13,10 @@ from app.helpers.serializer_helpers import SerializerHelpers
 import json
 from django.contrib.auth.models import User
 
+import asyncio
+import websockets
+from asgiref.sync import async_to_sync
+
 class Ports(APIView):
 
     def __init__(self):
@@ -93,26 +97,22 @@ class Ports(APIView):
         """ Executes when POST request is trigerred. """
 
         self.PREDICTION_ID = None
-        port = request.data.get('port', None)
-
-        # print(port, "IS THE PORT")
-        # input('test pause')
+        port = request.data.get('port', 'COM6')
         if port is None:
             return Response({
                 'message': 'No port provided.'
             }, 400)
         
-        heart_rates = self.read_serial(port=str(port))
+        print(port)
+        
+        heart_rates = self.read_serial(port = str(port))
+        # heart_rates = self.read_serial_demo()
+        
         if len(heart_rates) < 1:
-
             return Response({
-
                 'message': 'Sensor is not working.'
-
             }, 400)
 
-        # import pdb
-        # pdb.set_trace()
         request.data['sequential_ecg'] = { "rates": heart_rates }
   
         if self.insert_prediction(request):
@@ -124,7 +124,6 @@ class Ports(APIView):
                 'rates': heart_rates
 
             }, 200)
-    
 
 
     def list_serial_ports(self):
@@ -141,28 +140,65 @@ class Ports(APIView):
         
         available_ports = [port for port in ports if os.path.exists(port)]
         return available_ports
+    
+    
+    def read_serial_demo(self):
+        
+        rates = []
+        from websocket import create_connection
+        import random
+        ws = create_connection("ws://localhost:8080/ws/some_path/")
+        while True:
+
+            if len(rates) > (self.CONSTANT_MS_FROM_ARDUINO * self.SIGNAL_SECONDS) - 1:
+                break
+
+            sample_value = int(random.randint(200, 700))
+            payload = json.dumps({"message": sample_value})
+            ws.send(payload)
+
+            rates.append(sample_value)
+
+        return rates
+        
 
     def read_serial(self, port='/dev/ttyUSB0', baudrate=9600, timeout=1):
         rates = []
-        try:
+        from websocket import create_connection   # pip install websocket-client
 
+        try:
             with serial.Serial(port, baudrate, timeout=timeout) as ser:
                 print(f"Connected to {port}")
-                time.sleep(2)  # Allow time for the connection to establish
+                time.sleep(2)  # Allow Arduino to reset
+
+                # Connect to your WebSocket server (sync client)
+                ws = create_connection("ws://localhost:8080/ws/some_path/")
+                print("WebSocket connected")
 
                 while True:
                     if len(rates) > (self.CONSTANT_MS_FROM_ARDUINO * self.SIGNAL_SECONDS) - 1:
-                        return rates
-                    
+                        break
+
                     data = ser.readline().decode().strip()
+                    print(data, "is the data from strip")
 
                     if data:
-                        print("Reading ECG Signal(s) - Analog Rate", data)
-                        rates.append(data)
-                        
+                        try:
+                            data = int(data)
+                            rates.append(data)
+                            print(data, "is the data.")
+
+                            # Send to WebSocket server
+                            payload = json.dumps({"message": data})
+                            ws.send(payload)
+
+                        except ValueError:
+                            continue
+
+                ws.close()
+
         except Exception as e:
-            empty_list = []
-            for i in range(0, 3000):
-                empty_list.append(0)
-            return empty_list
+            print("Serial error:", e)
+            rates = [0 for _ in range(3000)]
+
         return rates

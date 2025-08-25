@@ -16,6 +16,12 @@ DATASETS.build()
 CARDIOLOGIST = Builder().addPage("app/cardiologist.html").addTitle("cardiologist")
 CARDIOLOGIST.build()
 
+CARDIOS = Builder().addPage("app/cardios.html").addTitle("cardios")
+CARDIOS.build()
+
+PRESCRIPTION = Builder().addPage("app/prescription.html").addTitle("prescription")
+PRESCRIPTION.build()
+
 PATIENTS = Builder().addPage("app/patients.html").addTitle("patients")
 PATIENTS.build()
 

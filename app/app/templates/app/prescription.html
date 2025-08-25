@@ -1,0 +1,138 @@
+{% extends "app/layout-prescription.html" %}
+
+{% block content %}
+
+{% load static %}
+
+<style>
+    .custom-cursive {
+        font-family: 'Brush Script MT', cursive; /* You can use any cursive font you like */
+    }
+
+@media print {
+    body {
+        visibility: hidden;
+    }
+    #prescription, #prescription * {
+        visibility: visible;
+    }
+
+    /* Enable background images */
+    body {
+        -webkit-print-color-adjust: exact; /* Safari */
+        print-color-adjust: exact; /* Chrome, Firefox, Edge */
+    }
+
+    /* Ensure images are printed */
+    img {
+        max-width: 100%;
+        visibility: visible;
+    }
+}
+
+
+</style>
+
+<!-- Vue.js instance -->
+<div id="prescription">
+
+    <!-- Printable Content -->
+    <div class="has-text-centered">
+        <p
+            class="is-size-4 has-text-weight-semibold has-text-grey-dark has-text-weight-light is-family-primary p-0 m-0">
+            Template Diagnostic(s) Center
+        </p>
+        <p
+            class="is-size-6 has-text-weight-semibold has-text-grey has-text-weight-light is-family-primary p-0 m-0">
+            Address: Put Address Here
+        </p>
+        <p
+            class="is-size-6 has-text-weight-semibold has-text-grey has-text-weight-light is-family-primary p-0 m-0">
+            Number: Put Number Here
+        </p>
+    </div>
+
+    <div class="content">
+        <hr class="my-4" style="border: 1px solid black;">
+    </div>
+
+    <div class="column mb-0 pb-0">
+        <h1 class="is-size-6 has-text-grey-darke pb-2">
+            Patient Name: {{ patient_name }}
+        </h1>
+
+    </div>
+
+    <div class="column pt-2 mt-2">
+        <div class="columns is-mobile">
+            <div class="column is-half">
+                <h1 class="is-size-6 has-text-grey-darke pb-2">
+                    Age: {{ age }}
+                </h1>
+            </div>
+            <div class="column">
+                <h1 class="is-size-6 has-text-grey-darke pb-2">
+                    Date: {{ date }}
+                </h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="column">
+        <h1 class="title is-size-1">
+            <i class="fa-solid fa-prescription"></i>
+        </h1>
+    </div>
+
+    <div class="column pt-2 mt-2">
+        <h1 class="is-size-4 has-text-grey-dark pb-2 custom-cursive">
+            {{ remarks }}
+        </h1>
+
+        <h1 class="is-size-6 has-text-grey-dark pb-2">
+            Notes: {{ recommendations }}
+        </h1>
+    </div>
+
+    <div class="column pt-2 mt-2">
+        <div class="is-flex is-flex-direction-column is-align-items-flex-end">
+            <!-- Image Section -->
+            <div>
+                <img class="image is-size-6"
+                    alt="Description of image" style="width: 250px"
+                    src="/{{ e_signature }}">
+            </div>
+
+            <!-- Physician Information Section -->
+            <h1 class="is-size-6 has-text-grey-dark mt-0 pt-0 has-text-right">
+                Physician Name: {{ attending_physician }}
+            </h1>
+
+        </div>
+    </div>
+
+</div>
+
+{% load static %}
+
+<script>
+    new Vue({
+        delimiters: ['[[', ']]'],
+        el: '#prescription',
+        data() {
+            return {}
+        },
+        mounted () {
+            this.automatePrint()
+        },
+        methods: {
+            automatePrint() {
+                setTimeout(function() {
+                    window.print();
+                }, 1000);   
+            }
+        },
+    });
+</script>
+
+{% endblock %}

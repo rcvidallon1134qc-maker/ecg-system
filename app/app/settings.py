@@ -81,6 +81,12 @@ SQL_LITE_DB = {
 
 DATABASES = SQL_LITE_DB
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -108,3 +114,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 STATIC_URL = "/static/"
 STATIC_ROOT = posixpath.join(*(BASE_DIR.split(os.path.sep) + ["static"]))
+
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = "/media/"
+

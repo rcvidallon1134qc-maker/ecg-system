@@ -6,7 +6,37 @@
 <div id="{{ obj_name }}">
 
     <div class="row">
-        [[ lists ]]
+        <div class="col-lg-6">
+            <div class="card text">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">Number of Patient(s):
+                        {{ patients }}</h5>
+                    <p class="card-text">Total Patient(s) in the system.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card text">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">Number of
+                        Cardiologist(s): {{ cardiologists }}</h5>
+                    <p class="card-text">Cardiologist's available and
+                        registered.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 col-lg-12">
+            <div class="card text">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">Number of
+                        Dataset(s) Available: {{ datasets }}</h5>
+                    <p class="card-text">Available dataset(s) in the system.</p>
+                </div>
+            </div>
+        </div>
+
     </div>
 
 </div>
