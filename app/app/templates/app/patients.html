@@ -225,6 +225,9 @@ new Vue({
     },
     methods: {
 
+        downloadCSV(prediction) {
+            window.location.href = '/download/' + prediction.id + '/'
+        },
         plotJS(props) {
       
             try {

@@ -16,6 +16,43 @@ from django.contrib.auth.models import User
 import asyncio
 import websockets
 from asgiref.sync import async_to_sync
+from app.models import Prediction
+import pandas as pd
+from rest_framework import status
+
+class UploadCSV(APIView):
+
+    def __init__(self):
+        pass
+
+    def post(self, request):
+        """ Upload CSV and save to Prediction model. """
+        try:
+            csv_file = request.FILES.get("file")
+
+            if not csv_file:
+                return Response(
+                    {"error": "CSV file and prediction ID are required."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Read CSV into DataFrame
+            df = pd.read_csv(csv_file)
+
+            # Flatten DataFrame into a list of values
+            values = df.values.flatten().tolist()
+
+            # Build sequential_ecg JSON structure
+            return Response(
+                {"message": "CSV uploaded and saved successfully.", "data": values},
+                status=status.HTTP_200_OK
+            )
+
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 class Ports(APIView):
 
@@ -97,17 +134,26 @@ class Ports(APIView):
         """ Executes when POST request is trigerred. """
 
         self.PREDICTION_ID = None
-        port = request.data.get('port', 'COM6')
-        if port is None:
-            return Response({
-                'message': 'No port provided.'
-            }, 400)
-        
-        print(port)
-        
-        heart_rates = self.read_serial(port = str(port))
+
+        port = request.data.get('port', None) # Append Later
+        is_raw = request.data.get('raw', False)
+        raw_data = None
+        heart_rates = None
+
+        if not is_raw:
+
+            if port is None:
+                return Response({
+                    'message': 'No port provided.'
+                }, 400)
+            
+            heart_rates = self.read_serial(port = str(port))
         # heart_rates = self.read_serial_demo()
-        
+
+        else:
+            raw_data = request.data['heart_rates']
+            heart_rates = raw_data
+ 
         if len(heart_rates) < 1:
             return Response({
                 'message': 'Sensor is not working.'

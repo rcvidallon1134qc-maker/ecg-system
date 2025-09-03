@@ -13,6 +13,7 @@ from app.defined_api.serialport import Ports
 from app.defined_api.train import Training
 from django.conf.urls.static import static
 from app import settings
+from app.defined_api.serialport import UploadCSV
 
 try:
     
@@ -57,6 +58,7 @@ api_patterns = [
     path("api/account-section/", AccountSection.as_view(), name="account-section"),
     path("api/serial-ports/", Ports.as_view(), name="serial-ports"),
     path("api/train-model/", Training.as_view(), name="train-model"),
+    path("api/upload-csv/", UploadCSV.as_view(), name="upload-csv")
 ]
 
 # Exists in views.py all the tempaltes.
@@ -72,6 +74,7 @@ template_patterns = [
     path("admin/", admin.site.urls),
     path("logout/", MainView.user_logout, name="logout"),
     path("login/", MainView.login, name="login"),
+    path("download/<int:id>/", MainView.download, name="download")
 ]
 
 

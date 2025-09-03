@@ -39,6 +39,18 @@
                         Data
                     </button>
 
+                    <div class="mb-3">
+                        <label for="formFile" class="form-label">Upload
+                            ECG Data Raw: *</label>
+                        <input class="form-control" v-model="fileUpload"
+                            type="file" id="fileInput">
+                    </div>
+
+                    <button class="btn btn-secondary w-100 mb-3"
+                        @click="plotJSRaw()">
+                        Upload ECG Data (Raw)
+                    </button>
+
                     <!-- <button class="btn btn-primary w-100 mb-2"
                         @click="testWS()">Test Web Socket
                     </button> -->
@@ -171,6 +183,7 @@ new Vue({
     delimiters: ["[[", "]]"],
     el: "#" + '{{ obj_name }}',
     data: {
+        fileUpload: null,
         selected_port: '',
         loading_state: {},
         lists: {},
@@ -414,6 +427,86 @@ new Vue({
                 closeModal('loading_message_modal')
             };
 
+        },
+
+
+        async plotJSRaw() {
+
+
+
+            try {
+
+                // Do First Reading
+
+                const csrftoken = getCookie("csrftoken");
+                axios.defaults.headers.common["X-CSRFToken"] = csrftoken;
+
+                const form_data = new FormData();
+                
+                // Append the selected file to the FormData object
+                const fileInput = document.getElementById('fileInput'); // Assuming you have an input element with id 'fileInput'
+                const file = fileInput.files[0]; // Get the first file selected by the user
+                form_data.append('file', file);
+            
+                const url = "/api/upload-csv/"
+                const reading_result = await axios.post(url, form_data)
+
+                console.log(reading_result.data.data)
+            
+                fileInput.files[0] = null
+
+                this.info.STATE = true
+                this.info.TITLE = 'Notification'
+                this.info.MESSAGE = 'Reading ECG Data'
+                
+                openModal('loading_message_modal')
+
+                axios.defaults.headers.common['X-CSRFToken'] = getCookie('csrftoken')
+
+                const payload = {
+                    "port": null,
+                    "patient": this.props.PATIENT.id,
+                    "raw": true,
+                    "heart_rates": reading_result.data.data
+                }
+
+                let response = await axios.post('/api/serial-ports/', payload);
+                let data = response.data;
+                
+                this.props.PREDICTION.id = response.data.prediction_id
+
+                let xValues = [...Array(data.rates.length).keys()];
+                let yValues = data.rates;
+                
+                this.info.MESSAGE = 'Predicting Fetched Data using GRU'
+                const prediction = await this.predictECGData(data.rates)
+        
+                if (prediction) {
+                    this.info.MESSAGE = prediction.data.message
+                }
+
+                let trace = {
+                    x: xValues,
+                    y: yValues,
+                    mode: 'lines',
+                    line: { color: 'blue' }
+                };
+
+                let layout = {
+                    title: 'ECG-Style Graph',
+                    xaxis: { title: 'Time' },
+                    yaxis: { title: 'Amplitude' }
+                };
+
+                Plotly.newPlot('ecg-graph', [trace], layout);
+
+            } catch (error) {
+                console.error("Error fetching ECG data:", error);
+            }
+
+            this.info.STATE = false
+            this.info.TITLE = 'Notification'
+            
         },
 
         async plotJS() {

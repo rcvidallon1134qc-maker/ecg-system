@@ -1,17 +1,25 @@
 from django.shortcuts import redirect
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
 import app.constants.template_constants as Templates
 from django.contrib.auth import logout, authenticate, login
 from app.helpers import authentication
 from app.defined_api.mitbih import Arrhythmia
 from app.dummies import PatientGenerator
 from app.models import Patient
+from app.defined_api.download_csv import ConvertToCSV
+from rest_framework.response import Response
 
 class TemplateView:
     """Built in Template Renderer View Level"""
 
     def __init__(self):
         pass
+
+    def download(self, request, id):
+        """ A method to download and return CSV file to the user. """
+        
+        csv_file = ConvertToCSV()._get_csv_file(id)
+        return csv_file
 
     def home(self, request):
         """Renders the home page."""
