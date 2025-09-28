@@ -3,6 +3,10 @@
 {% block content %}
 
 <div id="login">
+
+    {% include 'app/defined-modals/register_account.html' %}
+    {% include 'app/constants/universal_modal.html' %}
+
     <div class="row align-items-center g-lg-5 py-5">
         <div class="col-lg-7 text-center text-lg-start">
             <h1 class="display-4 fw-bold lh-1 mb-3">{{ app_name }}</h1>
@@ -24,17 +28,19 @@
                         name="password" v-model="password">
                     <label for="floatingPassword">Password</label>
                 </div>
-                <div class="checkbox mb-3">
-                    <label>
-                        <input type="checkbox" value="remember-me">
-                        Remember me
-                    </label>
-                </div>
+
                 <button class="w-100 btn btn-lg btn-primary" type="submit"
                     @click="login()">Sign up</button>
                 <hr class="my-4">
                 <small class="text-muted">By clicking Sign up, you agree to the
                     terms of use.</small>
+
+                <p class="lead">Don't have an account yet?</p>
+                <button class="btn btn-secondary"
+                    @click="openModal('register_modal')">
+                    Register Now
+                </button>
+
             </div>
 
         </div>
@@ -50,7 +56,17 @@
 
         data: {
             username: "",
-            password: ""
+            password: "",
+
+            first_name: "",
+            last_name: "",
+            email: "",
+            reenter_password: "",
+
+            info: {
+                TITLE: "",
+                MESSAGE: ""
+            }
         },
         mounted() {
 
@@ -60,6 +76,55 @@
             
         },
         methods: {
+
+            async registerAccount() {
+
+                const url = '/api/account-section/'
+
+                if (this.password === this.reenter_password) {
+
+                    const result = await axios.post(url, {
+                        "username": this.username,
+                        "password": this.password,
+                        "email": this.email,
+                        "first_name": this.first_name,
+                        "last_name": this.last_name
+                    })
+
+                    if (result) {
+
+                        const pathologist_url = '/api/list-create/cardiologist/'
+                        this.info.TITLE = 'Account Registration'
+                        this.info.MESSAGE = 'Account was registed successfully. Please wait for the admin to accept the request.'
+                        closeModal('register_modal')
+                        openModal('message_modal')
+
+                    } else {
+
+                        this.info.TITLE = 'Account Registration'
+                        this.info.MESSAGE = 'There was a problem in creating your account.'
+
+                        this.username = ''
+                        this.password = ''
+                        this.email = ''
+                        this.first_name = ''
+                        this.last_name = ''
+                        this.reenter_password = ''
+
+                        closeModal('register_modal')
+                        openModal('message_modal')
+                    }
+
+                } else {
+                    this.info.TITLE = 'Account Registration'
+                    this.info.MESSAGE = 'Password do not match.'
+                    closeModal('register_modal')
+                    openModal('message_modal')  
+                }
+
+
+            },
+
             async login() {
                 const result = axios.post("/api/login/", {
                     "username": this.username,

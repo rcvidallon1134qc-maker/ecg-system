@@ -6,6 +6,7 @@ from app.helpers.serializer_helpers import UserCreateSerializer
 from rest_framework import generics
 from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny
+from app.models import Cardiologist
 
 class AccountSection(generics.CreateAPIView):
     
@@ -17,6 +18,7 @@ class AccountSection(generics.CreateAPIView):
         response = super().post(request)
         if response.status_code == 201:
             User.objects.filter(username = response.data['username']).update(is_active = False)
+            Cardiologist.objects.create(user = User.objects.get(username = response.data['username']))
         
         return response
 

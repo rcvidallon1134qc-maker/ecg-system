@@ -270,12 +270,12 @@ new Vue({
 
         async viewPrescription() {
 
-            window.location.href = '/prescription/' + String(this.state.PREDICTION_ID) + '/'
+            window.open('/prescription/' + String(this.state.PREDICTION_ID) + '/', '_blank');
 
             this.props.PREDICTION.recommendations = ''
             this.state.PREDICTION_ID = null
             this.state.NOTES = ''
-            closeModalw('graph_modal')
+            closeModal('graph_modal')
             
         },
 
