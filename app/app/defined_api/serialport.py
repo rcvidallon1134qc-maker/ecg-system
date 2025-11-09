@@ -39,6 +39,12 @@ class UploadCSV(APIView):
             # Read CSV into DataFrame
             df = pd.read_csv(csv_file)
 
+            if len(df) < 2999:
+                return Response(
+                    {"error": "Data is invalid."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
             # Flatten DataFrame into a list of values
             values = df.values.flatten().tolist()
 
