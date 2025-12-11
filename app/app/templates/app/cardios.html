@@ -2,136 +2,570 @@
 {% load static %}
 {% block content %}
 
-<div id="{{ obj_name }}">
-    <div class="row">
-        <div class="col-lg-12">
-            <h1 class="display-6 fw-bold">
-                <i class="fa-solid fa-user"></i> Cardiologist's Profile
-            </h1>
-
-            <p class="lead fw-bold text-muted">
-                Here you can manage the cardiologist's profile.
-            </p>
-
-            <div class="card mb-3">
-                <div class="card-body">
-                    <label class="label mb-3">Name: *</label>
-                    <input v-if="props.USER" type="text"
-                        v-model="props.USER.user.first_name"
-                        class="form-control"
-                        disabled>
-
-                    <label class="label mb-3">Last Name: *</label>
-                    <input v-if="props.USER" type="text"
-                        v-model="props.USER.user.last_name"
-                        class="form-control mb-3" disabled>
-
-                    <label class="label mb-3">Suffixes: (Optional)</label>
-                    <input v-if="props.USER" v-model="props.USER.suffixes"
-                        type="text" class="form-control mb-3">
-
-                    <button class="btn btn-secondary w-100 mb-3"
-                        @click="updateSuffix()">
-                        Update Suffix
-                    </button>
-
-                    <label class="label mb-3">Current Signature:</label><br>
-                    <img v-if="props.USER" :src="props.USER.e_signature"
-                        class="img-fluid">
-
-                    <div class="mb-3">
-                        <label for="formFile" class="form-label">Upload
-                            Signature: *</label>
-                        <input class="form-control" v-model="fileUpload"
-                            type="file" id="fileInput">
+<div id="{{ obj_name }}" class="profile-bg w-100" style="min-height:100vh;width:100vw;overflow-x:hidden;">
+    <div class="container-fluid pt-5 px-3 px-md-5" style="max-width:100vw; margin-top: 4.5rem;">
+        <div class="row justify-content-center">
+            <div class="col-12 col-xl-10">
+                
+                <!-- Header Section -->
+                <div class="profile-header mb-4">
+                    <div class="row align-items-center">
+                        <div class="col-12">
+                            <h2 class="fw-bold mb-2 profile-title">
+                                <i class="fa-solid fa-user-doctor"></i> Cardiologist Profile
+                            </h2>
+                            <p class="profile-desc mb-0">
+                                <i class="fa-solid fa-info-circle me-2"></i>Manage your professional profile and digital signature
+                            </p>
+                        </div>
                     </div>
-
-                    <button class="btn btn-primary w-100 mb-3"
-                        @click="updateSignature()">
-                        Update Signature
-                    </button>
-
                 </div>
-            </div>
 
-            <!-- <h1 class="display-6 fw-bold">
-                <i class="fa-solid fa-user"></i> Cardiologist's Patient(s)
-            </h1>
-
-            <p class="lead fw-bold text-muted">
-                These are the list of Cardiologist's Patient(s) as attending
-                physician.
-            </p>
-
-            <div class="card">
-                <div class="card-body">
-                        <table class="table" v-if="lists.PREDICTION.results">
-             
-                            <thead>
-                                <tr>
-                                    <th scope="col">ID</th>
-                                    <th scope="col">Full Name</th>
-                                    <th scope="col">Option(s)</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                <tr v-for="patient in lists.PREDICTION.results">
-                                    <td>
-                                        [[ patient.id ]]
-                                    </td>
-
-                                    <td>
-                                        [[ patient.patient.first_name ]] [[ patient.patient.middle_name ]] 
-                                        [[ patient.patient.last_name ]]
-                                    </td>
-
-                                    <td>
-                                        <button class="btn btn-success" @click="viewPrescription(patient.id)">
-                                            View Record / Prescription
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                     
-
-                        </table>
-
-                        <div v-if="lists.PREDICTION"
-                            class="d-flex justify-content-end mt-2">
-                            <button class="btn btn-primary me-2"
-                                :disabled="lists.PREDICTION.previous === null"
-                                @click="switchPage('PREVIOUS')">
-                                <i class="fa-solid fa-left"></i> Previous
-                            </button>
-                            <button class="btn btn-primary me-2"
-                                :disabled="lists.PREDICTION.next === null"
-                                @click="switchPage('NEXT')">
-                                Next <i class="fa-solid fa-right"></i>
-                            </button>
+                <!-- Personal Information Card -->
+                <div class="card profile-card border-0 mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="stat-icon bg-gradient-doctor text-white me-3">
+                                <i class="fa-solid fa-id-card"></i>
+                            </div>
+                            <h5 class="mb-0" style="color: #2d3748; font-weight: 600;">Personal Information</h5>
                         </div>
 
+                        <div class="row g-3" v-if="props.USER">
+                            <!-- First Name -->
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="fa-solid fa-user me-2"></i>First Name
+                                </label>
+                                <input type="text" 
+                                       v-model="props.USER.user.first_name"
+                                       class="form-control"
+                                       disabled>
+                                <small class="text-muted">Contact admin to change</small>
+                            </div>
+
+                            <!-- Last Name -->
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="fa-solid fa-user me-2"></i>Last Name
+                                </label>
+                                <input type="text" 
+                                       v-model="props.USER.user.last_name"
+                                       class="form-control"
+                                       disabled>
+                                <small class="text-muted">Contact admin to change</small>
+                            </div>
+
+                            <!-- Suffixes -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">
+                                    <i class="fa-solid fa-certificate me-2"></i>Professional Suffixes (Optional)
+                                </label>
+                                <input type="text" 
+                                       v-model="props.USER.suffixes"
+                                       class="form-control"
+                                       placeholder="e.g., MD, PhD, FACC">
+                                <small class="text-muted">Enter your professional credentials</small>
+                            </div>
+
+                            <!-- Update Suffix Button -->
+                            <div class="col-12">
+                                <button class="btn btn-primary profile-btn w-100" @click="updateSuffix()">
+                                    <i class="fa-solid fa-save me-2"></i>Update Suffixes
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Loading State -->
+                        <div v-else class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
                     </div>
+                </div>
 
-            </div> -->
+                <!-- Digital Signature Card -->
+                <div class="card profile-card border-0 mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="stat-icon bg-gradient-signature text-white me-3">
+                                <i class="fa-solid fa-signature"></i>
+                            </div>
+                            <h5 class="mb-0" style="color: #2d3748; font-weight: 600;">Digital Signature</h5>
+                        </div>
+
+                        <div v-if="props.USER">
+                            <!-- Current Signature Preview -->
+                            <div class="signature-preview mb-4">
+                                <label class="form-label fw-semibold mb-3">
+                                    <i class="fa-solid fa-eye me-2"></i>Current Signature
+                                </label>
+                                <div class="signature-container">
+                                    <img v-if="props.USER.e_signature" 
+                                         :src="props.USER.e_signature"
+                                         class="signature-image"
+                                         alt="Digital Signature">
+                                    <div v-else class="no-signature">
+                                        <i class="fa-solid fa-image-slash"></i>
+                                        <p class="mb-0 mt-2">No signature uploaded</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Upload New Signature -->
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fa-solid fa-upload me-2"></i>Upload New Signature
+                                    </label>
+                                    <div class="file-upload-wrapper">
+                                        <input class="form-control" 
+                                               type="file" 
+                                               id="fileInput"
+                                               accept="image/*"
+                                               @change="previewSignature">
+                                        <small class="text-muted d-block mt-2">
+                                            <i class="fa-solid fa-circle-info me-1"></i>
+                                            Accepted formats: JPG, PNG, GIF (Max 2MB)
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <!-- Preview New Upload -->
+                                <div class="col-12" v-if="previewImage">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fa-solid fa-magnifying-glass me-2"></i>Preview
+                                    </label>
+                                    <div class="signature-container preview-container">
+                                        <img :src="previewImage" class="signature-image" alt="Signature Preview">
+                                    </div>
+                                </div>
+
+                                <!-- Update Button -->
+                                <div class="col-12">
+                                    <button class="btn btn-success profile-btn w-100" 
+                                            @click="updateSignature()"
+                                            :disabled="!fileSelected">
+                                        <i class="fa-solid fa-cloud-arrow-up me-2"></i>Update Signature
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Loading State -->
+                        <div v-else class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Success/Error Message -->
+                <div v-if="message.show" class="alert" :class="message.type" role="alert">
+                    <div class="d-flex align-items-center">
+                        <i class="fa-solid me-2" :class="message.type === 'alert-success' ? 'fa-circle-check' : 'fa-circle-exclamation'"></i>
+                        <div>
+                            <strong>[[ message.title ]]</strong>
+                            <p class="mb-0">[[ message.text ]]</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
-
     </div>
-
 </div>
 
-<script>
+<style>
+    html, body {
+        height: 100%;
+        width: 100vw;
+        margin: 0;
+        padding: 0;
+        background: none;
+        overflow-x: hidden;
+    }
 
+    .profile-bg {
+        background: linear-gradient(135deg, #f8fafc 0%, #e0e7ef 100%);
+        min-height: 100vh;
+        min-width: 100vw;
+        width: 100vw;
+        position: relative;
+        overflow-x: hidden;
+    }
+
+    .profile-title {
+        color: #2d3748;
+        text-shadow: 1px 2px 8px rgba(102,126,234,0.08);
+    }
+
+    .profile-desc {
+        color: #4a5568;
+        opacity: 0.9;
+        font-size: 0.95rem;
+    }
+
+    .profile-header {
+        margin-bottom: 2rem;
+    }
+
+    .profile-card {
+        border-radius: 1.2rem;
+        background: #fff;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.10);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .profile-card:hover {
+        transform: translateY(-3px) scale(1.01);
+        box-shadow: 0 1.5rem 3rem rgba(102,126,234,0.10) !important;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        box-shadow: 0 2px 8px rgba(102,126,234,0.08);
+        flex-shrink: 0;
+    }
+
+    .bg-gradient-doctor {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .bg-gradient-signature {
+        background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    /* Signature Preview */
+    .signature-preview {
+        background: #f8fafc;
+        border-radius: 1rem;
+        padding: 1.5rem;
+    }
+
+    .signature-container {
+        background: white;
+        border: 2px dashed #e2e8f0;
+        border-radius: 0.75rem;
+        padding: 2rem;
+        text-align: center;
+        min-height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .signature-image {
+        max-width: 100%;
+        max-height: 200px;
+        height: auto;
+        object-fit: contain;
+        border-radius: 0.5rem;
+    }
+
+    .no-signature {
+        color: #cbd5e0;
+        text-align: center;
+    }
+
+    .no-signature i {
+        font-size: 3rem;
+        opacity: 0.5;
+    }
+
+    .no-signature p {
+        color: #a0aec0;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+    }
+
+    .preview-container {
+        border-color: #667eea;
+        background: #f8fafc;
+    }
+
+    /* File Upload */
+    .file-upload-wrapper {
+        position: relative;
+    }
+
+    .form-control[type="file"] {
+        cursor: pointer;
+        border: 2px dashed #e2e8f0;
+        padding: 1rem;
+        border-radius: 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control[type="file"]:hover {
+        border-color: #667eea;
+        background: #f8fafc;
+    }
+
+    .form-control[type="file"]:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.15rem rgba(102,126,234,0.15);
+    }
+
+    /* Form Styling */
+    .form-control {
+        border-radius: 0.7rem;
+        border: 1px solid #e2e8f0;
+        font-size: 0.95rem;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.15rem rgba(102,126,234,0.15);
+    }
+
+    .form-control:disabled {
+        background-color: #f3f4f6;
+        color: #9ca3af;
+        cursor: not-allowed;
+    }
+
+    .form-label {
+        color: #2d3748;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    /* Button Styling */
+    .profile-btn {
+        border-radius: 0.7rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: #fff;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+        background: linear-gradient(90deg, #764ba2 0%, #667eea 100%) !important;
+        box-shadow: 0 0.5rem 1rem rgba(102,126,234,0.15);
+        transform: translateY(-2px);
+    }
+
+    .btn-success {
+        background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+        border: none;
+        color: #fff;
+    }
+
+    .btn-success:hover:not(:disabled) {
+        background: linear-gradient(90deg, #059669 0%, #10b981 100%) !important;
+        box-shadow: 0 0.5rem 1rem rgba(16,185,129,0.15);
+        transform: translateY(-2px);
+    }
+
+    .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none !important;
+    }
+
+    /* Alert Messages */
+    .alert {
+        border-radius: 0.75rem;
+        border: none;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1rem;
+        animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .alert-success {
+        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+        color: #065f46;
+    }
+
+    .alert-danger {
+        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+        color: #991b1b;
+    }
+
+    /* Spinner */
+    .spinner-border {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-width: 0.3rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 991.98px) {
+        .profile-bg {
+            background: #fff;
+        }
+
+        .profile-title {
+            color: #212529;
+            text-shadow: none;
+            font-size: 1.75rem;
+        }
+
+        .profile-desc {
+            color: #6c757d !important;
+            font-size: 0.9rem;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 1.1rem;
+        }
+
+        .card-body {
+            padding: 1.25rem !important;
+        }
+
+        .signature-container {
+            min-height: 150px;
+            padding: 1.5rem;
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        .profile-title {
+            font-size: 1.5rem;
+        }
+
+        .profile-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-icon {
+            width: 36px;
+            height: 36px;
+            font-size: 1rem;
+        }
+
+        .card-body {
+            padding: 1rem !important;
+        }
+
+        .form-label {
+            font-size: 0.875rem;
+        }
+
+        .form-control {
+            font-size: 0.9rem;
+            padding: 0.625rem 0.875rem;
+        }
+
+        .profile-btn {
+            padding: 0.625rem 1.25rem;
+            font-size: 0.9rem;
+        }
+
+        .signature-container {
+            min-height: 120px;
+            padding: 1rem;
+        }
+
+        .signature-image {
+            max-height: 150px;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .profile-title {
+            font-size: 1.25rem;
+        }
+
+        .profile-desc {
+            font-size: 0.85rem;
+        }
+
+        .container-fluid {
+            padding-left: 0.75rem !important;
+            padding-right: 0.75rem !important;
+        }
+
+        .card {
+            margin-bottom: 1rem !important;
+        }
+
+        .card-body {
+            padding: 0.875rem !important;
+        }
+
+        .stat-icon {
+            width: 32px;
+            height: 32px;
+            font-size: 0.9rem;
+        }
+
+        .signature-preview {
+            padding: 1rem;
+        }
+
+        .form-label {
+            font-size: 0.8rem;
+        }
+
+        .form-control {
+            font-size: 0.875rem;
+            padding: 0.5rem 0.75rem;
+        }
+
+        .profile-btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        .alert {
+            padding: 0.75rem 1rem;
+            font-size: 0.875rem;
+        }
+    }
+</style>
+
+<script>
 new Vue({
     delimiters: ["[[", "]]"],
     el: "#" + '{{ obj_name }}',
     data: {
         fileUpload: null,
+        fileSelected: false,
+        previewImage: null,
         lists: {},
         url_models: {},
         loading_state: {},
         endpoints: {},
         info: { MESSAGE: '', TITLE: '' },
+        message: {
+            show: false,
+            type: '',
+            title: '',
+            text: ''
+        },
         state: {
             'USER_ID': '{{ user.id }}',
             'PATIENT_UPDATE': false,
@@ -151,25 +585,66 @@ new Vue({
     },
     computed: {},
     mounted() {
-
         if (document.querySelector("#" + '{{ obj_name }}')) {
             console.log("Mounted " + '{{ obj_name }}' + " page.")
         }
         initializeModels(this, ['CARDIOLOGIST', 'USER', 'PATIENT', 'PREDICTION'])
         universalGet(this, 'LIST_GET', 'PREDICTION', 'PREDICTION', 'PREDICTION', {page: 1, attending_physician: 1})
         this.getUserDetails()
-
     },
-
     methods: {
+        showMessage(type, title, text) {
+            this.message = {
+                show: true,
+                type: type === 'success' ? 'alert-success' : 'alert-danger',
+                title: title,
+                text: text
+            }
+            
+            setTimeout(() => {
+                this.message.show = false
+            }, 5000)
+        },
 
-    async switchPage (option) {
+        previewSignature(event) {
+            const file = event.target.files[0]
+            if (file) {
+                // Validate file size (2MB limit)
+                if (file.size > 2 * 1024 * 1024) {
+                    this.showMessage('error', 'Error', 'File size must be less than 2MB')
+                    event.target.value = ''
+                    this.fileSelected = false
+                    this.previewImage = null
+                    return
+                }
 
+                // Validate file type
+                if (!file.type.startsWith('image/')) {
+                    this.showMessage('error', 'Error', 'Please upload an image file')
+                    event.target.value = ''
+                    this.fileSelected = false
+                    this.previewImage = null
+                    return
+                }
+
+                this.fileSelected = true
+                const reader = new FileReader()
+                reader.onload = (e) => {
+                    this.previewImage = e.target.result
+                }
+                reader.readAsDataURL(file)
+            } else {
+                this.fileSelected = false
+                this.previewImage = null
+            }
+        },
+
+        async switchPage(option) {
             var action = ''
             if (option === 'NEXT') {
                 action = this.lists.PREDICTION.next
             } else if (option === 'PREVIOUS') {
-                action = ensurePageParam(this.lists.PREDICTION.previous )
+                action = ensurePageParam(this.lists.PREDICTION.previous)
             }
 
             await universalGet(this, 
@@ -181,37 +656,51 @@ new Vue({
                 action)
         },
 
-    // Object Calls.
-     viewPrescription(id) {
-        window.location.href = "/prescription/" + String(id) + "/"
-     },
-     async updateSignature() {
-                const csrftoken = getCookie("csrftoken");
-                axios.defaults.headers.common["X-CSRFToken"] = csrftoken;
+        viewPrescription(id) {
+            window.location.href = "/prescription/" + String(id) + "/"
+        },
 
-                const form_data = new FormData();
-                form_data.append('image', this.fileUpload)
+        async updateSignature() {
+            try {
+                const fileInput = document.getElementById('fileInput')
+                const file = fileInput.files[0]
 
-                // Append the selected file to the FormData object
-                const fileInput = document.getElementById('fileInput'); // Assuming you have an input element with id 'fileInput'
-                const file = fileInput.files[0]; // Get the first file selected by the user
-                form_data.append('e_signature', file);
+                if (!file) {
+                    this.showMessage('error', 'Error', 'Please select a file to upload')
+                    return
+                }
+
+                const csrftoken = getCookie("csrftoken")
+                axios.defaults.headers.common["X-CSRFToken"] = csrftoken
+
+                const form_data = new FormData()
+                form_data.append('e_signature', file)
             
-            const url = "/api/get-update-destroy/cardiologist/" + String(this.props.USER.id) + "/"
-            await axios
-                .patch(url, form_data)
-                .then((response) => {
-                    console.log(response)
-
-                })
-                .catch((error) => {
-                    console.error(error);
-                });
-
-            await this.getUserDetails()
-            fileInput.files[0] = null
+                const url = "/api/get-update-destroy/cardiologist/" + String(this.props.USER.id) + "/"
                 
-            },
+                await axios
+                    .patch(url, form_data)
+                    .then((response) => {
+                        console.log(response)
+                        this.showMessage('success', 'Success!', 'Digital signature updated successfully')
+                    })
+                    .catch((error) => {
+                        console.error(error)
+                        this.showMessage('error', 'Error', 'Failed to update signature. Please try again.')
+                    })
+
+                await this.getUserDetails()
+                
+                // Clear file input and preview
+                fileInput.value = ''
+                this.fileSelected = false
+                this.previewImage = null
+                
+            } catch (error) {
+                console.error(error)
+                this.showMessage('error', 'Error', 'An unexpected error occurred')
+            }
+        },
 
         async getUserDetails() {
             const result = await universalGet(this, 'LIST_GET', 'CARDIOLOGIST', 'CARDIOLOGIST', 'CARDIOLOGIST', {user: this.state.USER_ID})
@@ -228,31 +717,34 @@ new Vue({
         },
 
         async updateSuffix() {
-            
-            const csrftoken = getCookie("csrftoken");
-            axios.defaults.headers.common["X-CSRFToken"] = csrftoken;
+            try {
+                const csrftoken = getCookie("csrftoken")
+                axios.defaults.headers.common["X-CSRFToken"] = csrftoken
 
-            const url = "/api/get-update-destroy/cardiologist/" + String(this.props.USER.id) + "/"
-            console.log(this.props.USER.suffixes)
-            const result = await axios
-                .patch(url, {
-                    'suffixes': this.props.USER.suffixes
-                })
-                .then((response) => {
-                    console.log(response)
+                const url = "/api/get-update-destroy/cardiologist/" + String(this.props.USER.id) + "/"
+                
+                await axios
+                    .patch(url, {
+                        'suffixes': this.props.USER.suffixes
+                    })
+                    .then((response) => {
+                        console.log(response)
+                        this.showMessage('success', 'Success!', 'Professional suffixes updated successfully')
+                    })
+                    .catch((error) => {
+                        console.error(error)
+                        this.showMessage('error', 'Error', 'Failed to update suffixes. Please try again.')
+                    })
 
-                })
-                .catch((error) => {
-                    console.error(error);
-                });
-
-            // await this.getUserDetails()
-
-
+                await this.getUserDetails()
+                
+            } catch (error) {
+                console.error(error)
+                this.showMessage('error', 'Error', 'An unexpected error occurred')
+            }
         }
-
-
-    },
-});
+    }
+})
 </script>
+
 {% endblock %}

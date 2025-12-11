@@ -74,7 +74,8 @@ class Ports(APIView):
         )
 
         Prediction.objects.all().filter(id = prediction_id).update(
-            remarks = prediction
+            remarks = prediction,
+            arrhythmia_type = prediction
         )
 
         return Response(
@@ -119,7 +120,8 @@ class Ports(APIView):
 
                 patient = Patient.objects.get(id = patient),
                 sequential_ecg = sequential_ecg,
-                remarks = 'No Remark'
+                remarks = 'No Remark',
+                arrhythmia_type = 'Pending Analysis'
             )
 
             self.PREDICTION_ID = pred.pk

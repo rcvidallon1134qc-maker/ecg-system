@@ -2,144 +2,342 @@
 {% load static %}
 {% block content %}
 
-<div id="login">
-
-    {% include 'app/defined-modals/register_account.html' %}
-    {% include 'app/constants/universal_modal.html' %}
-
-    <div class="row align-items-center g-lg-5 py-5">
-        <div class="col-lg-7 text-center text-lg-start">
-            <h1 class="display-4 fw-bold lh-1 mb-3">{{ app_name }}</h1>
-            <p class="col-lg-10 fs-4">{{ app_desc }}</p>
-        </div>
-        <div class="col-md-10 mx-auto col-lg-5">
-
-            <div class="p-4 p-md-5 border rounded-3 bg-light">
-                <div class="form-floating mb-3">
-                    <input type="text" class="form-control"
-                        id="floatingInput"
-                        placeholder="Username" name="username"
-                        v-model="username">
-                    <label for="floatingInput">Email Address / Username</label>
+<div id="login" class="login-bg d-flex align-items-center justify-content-center" style="min-height:100vh;width:100vw;position:fixed;top:0;left:0;z-index:0;overflow-y:auto;">
+    <div class="container-fluid h-100 d-flex align-items-center justify-content-center" style="min-height:100vh;">
+        <div class="container-fluid">
+            <div class="row g-4 g-lg-5 align-items-center justify-content-center">
+                <!-- Left Column - Branding -->
+                <div class="col-12 col-lg-6 col-xl-5 text-center text-lg-start mb-4 mb-lg-0">
+                    <div class="mb-3 d-flex justify-content-center justify-content-lg-start">
+                        <!-- Heart SVG Logo -->
+                        <div class="heart-logo">
+                            <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <linearGradient id="heartGradient" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+                                        <stop stop-color="#ff5f6d"/>
+                                        <stop offset="1" stop-color="#ffc371"/>
+                                    </linearGradient>
+                                </defs>
+                                <path d="M32 58s-1.7-1.5-4.6-4.1C14.2 41.2 4 32.7 4 22.5 4 13.6 11.6 6 20.5 6c4.7 0 9.1 2.2 11.5 5.7C34.4 8.2 38.8 6 43.5 6 52.4 6 60 13.6 60 22.5c0 10.2-10.2 18.7-23.4 31.4C33.7 56.5 32 58 32 58z" fill="url(#heartGradient)" stroke="#ff5f6d" stroke-width="2"/>
+                                <polyline points="32,58 32,38 38,38 38,28 26,28 26,38 32,38" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <h1 class="display-4 fw-bold lh-1 mb-3 app-title">{{ app_name }}</h1>
+                    <p class="fs-5 text-muted mb-4 app-desc">{{ app_desc }}</p>
+                    <div class="d-none d-lg-block">
+                        <ul class="list-unstyled">
+                            <li class="mb-3 d-flex align-items-center">
+                                <span class="icon-check me-2">✔️</span>
+                                <span>Secure and reliable platform</span>
+                            </li>
+                            <li class="mb-3 d-flex align-items-center">
+                                <span class="icon-check me-2">✔️</span>
+                                <span>24/7 access to your account</span>
+                            </li>
+                            <li class="d-flex align-items-center">
+                                <span class="icon-check me-2">✔️</span>
+                                <span>Easy to use interface</span>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-                <div class="form-floating mb-3">
-                    <input type="password" class="form-control"
-                        id="floatingPassword" placeholder="Password"
-                        name="password" v-model="password">
-                    <label for="floatingPassword">Password</label>
+                <!-- Right Column - Login Form -->
+                <div class="col-12 col-md-10 col-lg-6 col-xl-5">
+                    <div class="card shadow-lg border-0">
+                        <div class="card-body p-4 p-md-5">
+                            <h2 class="card-title text-center mb-4 fw-bold">Welcome Back</h2>
+                            <p class="text-center text-muted mb-4">Sign in to continue to your account</p>
+                            <!-- Alert for errors -->
+                            <div v-if="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+                                [[ error ]]
+                                <button type="button" class="btn-close" @click="error = ''"></button>
+                            </div>
+                            <form @submit.prevent="login()">
+                                <!-- Username/Email Input -->
+                                <div class="mb-3">
+                                    <label for="floatingInput" class="form-label fw-semibold">Email Address / Username</label>
+                                    <input 
+                                        type="text" 
+                                        class="form-control form-control-lg" 
+                                        id="floatingInput"
+                                        placeholder="Enter your email or username" 
+                                        v-model="username"
+                                        required
+                                        autocomplete="username">
+                                </div>
+                                <!-- Password Input -->
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <label for="floatingPassword" class="form-label fw-semibold mb-0">Password</label>
+                                    </div>
+                                    <div class="input-group">
+                                        <input 
+                                            :type="showPassword ? 'text' : 'password'" 
+                                            class="form-control form-control-lg" 
+                                            id="floatingPassword" 
+                                            placeholder="Enter your password"
+                                            v-model="password"
+                                            required
+                                            autocomplete="current-password">
+                                        <button 
+                                            class="btn btn-outline-secondary" 
+                                            type="button" 
+                                            @click="showPassword = !showPassword">
+                                            <i :class="showPassword ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- Remember Me -->
+                                <div class="mb-4 form-check">
+                                    <input type="checkbox" class="form-check-input" id="rememberMe" v-model="rememberMe">
+                                    <label class="form-check-label" for="rememberMe">
+                                        Remember me
+                                    </label>
+                                </div>
+                                <!-- Submit Button -->
+                                <button 
+                                    class="w-100 btn btn-lg btn-primary mb-3" 
+                                    type="submit"
+                                    :disabled="loading">
+                                    <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
+                                    <span v-if="loading">Signing in...</span>
+                                    <span v-else><i class="fa-solid fa-right-to-bracket me-2"></i>Sign In</span>
+                                </button>
+                                <!-- Info Box -->
+                                <div class="alert alert-info border-0 mt-4" style="background-color: #e8f4fd;">
+                                    <div class="d-flex align-items-start">
+                                        <i class="fa-solid fa-info-circle me-2 mt-1"></i>
+                                        <small>
+                                            <strong>Administrator Access Only</strong><br>
+                                            New user accounts can only be created by administrators. Please contact your system administrator if you need an account.
+                                        </small>
+                                    </div>
+                                </div>
+                                <!-- Terms -->
+                                <p class="text-center text-muted small mt-4 mb-0">
+                                    By signing in, you agree to our 
+                                    <a href="#" class="text-decoration-none">Terms of Service</a> and 
+                                    <a href="#" class="text-decoration-none">Privacy Policy</a>
+                                </p>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-
-                <button class="w-100 btn btn-lg btn-primary" type="submit"
-                    @click="login()">Sign up</button>
-                <hr class="my-4">
-                <small class="text-muted">By clicking Sign up, you agree to the
-                    terms of use.</small>
-
-                <p class="lead">Don't have an account yet?</p>
-                <button class="btn btn-secondary"
-                    @click="openModal('register_modal')">
-                    Register Now
-                </button>
-
             </div>
-
         </div>
     </div>
-
 </div>
 
-<script>
+<style>
+    html, body {
+        height: 100%;
+        width: 100vw;
+        margin: 0;
+        padding: 0;
+        background: none;
+        overflow-x: hidden;
+    }
+    .login-bg {
+        background: linear-gradient(135deg, #f8fafc 0%, #e0e7ef 100%);
+        min-height: 100vh;
+        width: 100vw;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+    #login {
+        min-height: 100vh;
+        width: 100vw;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+    .heart-logo {
+        display: inline-block;
+        margin-bottom: 0.5rem;
+        filter: drop-shadow(0 2px 8px rgba(255,95,109,0.15));
+        transition: transform 0.2s;
+    }
+    .heart-logo:hover {
+        transform: scale(1.08) rotate(-2deg);
+    }
+    .app-title {
+        color: #2d3748;
+        text-shadow: 1px 2px 8px rgba(255,95,109,0.08);
+    }
+    .app-desc {
+        color: #4a5568;
+    }
+    .icon-check {
+        color: #ff5f6d;
+        font-size: 1.2rem;
+    }
+    #login .card {
+        border-radius: 1.2rem;
+        background: #fff;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.10);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    #login .card:hover {
+        transform: translateY(-3px) scale(1.01);
+        box-shadow: 0 1.5rem 3rem rgba(255,95,109,0.10)!important;
+    }
+    #login .form-control:focus,
+    #login .form-control-lg:focus {
+        border-color: #ff5f6d;
+        box-shadow: 0 0 0 0.15rem rgba(255,95,109,0.15);
+    }
+    #login .btn-primary {
+        background: linear-gradient(90deg, #ff5f6d 0%, #ffc371 100%);
+        border: none;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        border-radius: 0.7rem;
+        transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+        color: #fff;
+    }
+    #login .btn-primary:hover {
+        background: linear-gradient(90deg, #ffc371 0%, #ff5f6d 100%);
+        box-shadow: 0 0.5rem 1rem rgba(255,95,109,0.15);
+        transform: translateY(-2px);
+        color: #fff;
+    }
+    #login .btn-primary:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+    }
+    #login .btn-outline-secondary {
+        border-radius: 0 0.7rem 0.7rem 0;
+        border-color: #ced4da;
+        color: #6c757d;
+        transition: all 0.2s;
+    }
+    #login .btn-outline-secondary:hover {
+        background: #f8f9fa;
+        color: #ff5f6d;
+        border-color: #ff5f6d;
+    }
+    #login h1, #login .display-3, #login .display-4 {
+        color: #2d3748;
+        text-shadow: 1px 2px 8px rgba(255,95,109,0.08);
+    }
+    #login .text-muted {
+        opacity: 0.9;
+    }
+    #login .alert-info {
+        border-radius: 0.7rem;
+    }
+    #login a {
+        color: #ff5f6d;
+        transition: color 0.2s;
+    }
+    #login a:hover {
+        color: #ffc371;
+    }
+    @media (max-width: 991.98px) {
+        .login-bg {
+            background: #f8f9fa;
+        }
+        #login h1, #login .display-3, #login .display-4 {
+            color: #212529;
+            text-shadow: none;
+        }
+        #login .col-12 p {
+            color: #6c757d!important;
+        }
+        .heart-logo {
+            margin-bottom: 1rem;
+        }
+    }
+    @media (max-width: 767.98px) {
+        .login-bg {
+            padding: 1rem 0.5rem;
+        }
+        .app-title {
+            font-size: 2rem;
+        }
+        #login .card {
+            padding: 0.5rem;
+        }
+        #login .card-body {
+            padding: 1.5rem !important;
+        }
+        .heart-logo svg {
+            width: 48px;
+            height: 48px;
+        }
+    }
+</style>
 
+<script>
     new Vue({
         delimiters: ["[[", "]]"],
         el: "#login",
-
         data: {
             username: "",
             password: "",
-
-            first_name: "",
-            last_name: "",
-            email: "",
-            reenter_password: "",
-
-            info: {
-                TITLE: "",
-                MESSAGE: ""
-            }
+            showPassword: false,
+            rememberMe: false,
+            loading: false,
+            error: ""
         },
         mounted() {
-
             if (document.querySelector('#login')) {
                 console.log("Mounted login page.")
             }
-            
         },
         methods: {
-
-            async registerAccount() {
-
-                const url = '/api/account-section/'
-
-                if (this.password === this.reenter_password) {
-
-                    const result = await axios.post(url, {
-                        "username": this.username,
-                        "password": this.password,
-                        "email": this.email,
-                        "first_name": this.first_name,
-                        "last_name": this.last_name
-                    })
-
-                    if (result) {
-
-                        const pathologist_url = '/api/list-create/cardiologist/'
-                        this.info.TITLE = 'Account Registration'
-                        this.info.MESSAGE = 'Account was registed successfully. Please wait for the admin to accept the request.'
-                        closeModal('register_modal')
-                        openModal('message_modal')
-
-                    } else {
-
-                        this.info.TITLE = 'Account Registration'
-                        this.info.MESSAGE = 'There was a problem in creating your account.'
-
-                        this.username = ''
-                        this.password = ''
-                        this.email = ''
-                        this.first_name = ''
-                        this.last_name = ''
-                        this.reenter_password = ''
-
-                        closeModal('register_modal')
-                        openModal('message_modal')
-                    }
-
-                } else {
-                    this.info.TITLE = 'Account Registration'
-                    this.info.MESSAGE = 'Password do not match.'
-                    closeModal('register_modal')
-                    openModal('message_modal')  
-                }
-
-
-            },
-
             async login() {
-                const result = axios.post("/api/login/", {
-                    "username": this.username,
-                    "password": this.password
-                }).then(response => {
+                if (!this.username || !this.password) {
+                    this.error = "Please enter both username and password"
+                    return
+                }
+                this.loading = true
+                this.error = ""
+                try {
+                    const response = await axios.post("/api/login/", {
+                        "username": this.username,
+                        "password": this.password
+                    })
                     if (response.status === 200) {
-                        localStorage.setItem('token', response.data.token)
+                        if (response.data.token) {
+                            sessionStorage.setItem('token', response.data.token)
+                            if (this.rememberMe) {
+                                // Store in memory or handle remember me logic server-side
+                            }
+                        }
                         window.location.href = "/home"
-                    } else {
-
                     }
-                }).catch(error => {});
-
+                } catch (error) {
+                    this.loading = false
+                    if (error.response) {
+                        if (error.response.status === 401) {
+                            this.error = "Invalid username or password. Please try again."
+                        } else if (error.response.status === 403) {
+                            this.error = "Your account is not active. Please contact the administrator."
+                        } else {
+                            this.error = "An error occurred. Please try again later."
+                        }
+                    } else {
+                        this.error = "Unable to connect. Please check your internet connection."
+                    }
+                }
             }
-        },
+        }
     });
-    </script>
+</script>
 {% endblock %}

@@ -2,237 +2,749 @@
 {% load static %}
 {% block content %}
 
-<div id="{{ obj_name }}">
+<div id="{{ obj_name }}" class="dashboard-bg w-100" style="min-height:100vh;width:100vw;overflow-x:hidden;">
+    
+    {% include 'app/constants/universal_modal.html' %}
+    {% include 'app/defined/patient_records.html' %}
+    {% include 'app/defined/show_graph.html' %}
 
-    <div class="row">
-
-        {% include 'app/constants/universal_modal.html' %}
-        {% include 'app/defined/patient_records.html' %}
-        {% include 'app/defined/show_graph.html' %}
-
-        <h1 class="display-6 fw-bold"><i class="fa-solid fa-users-medical"></i>
-            Patient(s)
-        </h1>
-
-        <p class="lead fw-bold text-muted">
-            Here you can add and manage patient's information.
-        </p>
-
-        <div class="card mb-4">
-            <div class="card-body">
-
-                <label class="label mb-2 mt-2">
-                    First Name: *
-                </label>
-
-                <input type="text" v-model="props.PATIENT.first_name"
-                    class="form-control mb-2" />
-
-                <label class="label mb-2">
-                    Middle Name: (Optional)
-                </label>
-
-                <input type="text" v-model="props.PATIENT.middle_name"
-                    class="form-control mb-2" />
-
-                <label class="label mb-2">
-                    Last Name: *
-                </label>
-
-                <input type="text" v-model="props.PATIENT.last_name"
-                    class="form-control mb-2" />
-
-                <label class="label mb-2">
-                    Birth Date: *
-                </label>
-
-                <input type="date" v-model="props.PATIENT.birth"
-                    class="form-control mb-4" />
-
-                <button class="btn btn-success" @click="savePatient()">
-
-                    <span v-if="state.PATIENT_UPDATE === true">
-                        Save Changes <i class="fa-solid fa-floppy-disk"></i>
-                    </span>
-                    <span v-else>
-                        Add Patient <i class="fa-solid fa-plus"></i>
-                    </span>
-
-                </button>
-
-                <button class="btn btn-primary" @click="filterPatient()">
-                    Search Patient <i class="fa-solid fa-magnifying-glass"></i>
-                </button>
-
-            </div>
-        </div>
-
-        <div class="card mb-4">
-            <div class="card-body">
-                <div class="table-responsive">
-
-                    <div v-if="loading_state.PATIENT">
-                        {% include 'app/constants/loading.html' %}
-                    </div>
-                    <div v-else>
-
-                        <div class="row m-2" :hidden="true">
-
-                            <div class="col-lg-4">
-                                <label class="label mb-2">First Name:</label>
-                                <input
-                                    type="text"
-                                    v-model="props.PATIENT.first_name"
-                                    class="form-control mb-2"
-                                    :disabled="state.SELECTED_PATIENT" />
-                            </div>
-
-                            <div class="col-lg-4">
-                                <label class="label mb-2">Middle Name:</label>
-                                <input
-                                    type="text"
-                                    v-model="props.PATIENT.middle_name"
-                                    class="form-control mb-2"
-                                    :disabled="state.SELECTED_PATIENT" />
-                            </div>
-
-                            <div class="col-lg-4">
-                                <label class="label mb-2">Last Name:</label>
-                                <input
-                                    type="text"
-                                    v-model="props.PATIENT.last_name"
-                                    class="form-control mb-2"
-                                    :disabled="state.SELECTED_PATIENT" />
-                            </div>
-
-                            <div class="col-lg-12">
-                                <button class="btn btn-primary mb-2">Filter
-                                    Search</button>
-                            </div>
-
+    <div class="container-fluid pt-5 px-3 px-md-5" style="max-width:100vw; margin-top: 4.5rem;">
+        <div class="row justify-content-center">
+            <div class="col-12 col-xl-11">
+                
+                <!-- Header Section -->
+                <div class="dashboard-header mb-4">
+                    <div class="row align-items-center">
+                        <div class="col-12 col-md-8">
+                            <h2 class="fw-bold mb-2 dashboard-title">
+                                <i class="fa-solid fa-users-medical"></i> Patient Management
+                            </h2>
+                            <p class="dashboard-desc mb-0">
+                                <i class="fa-solid fa-info-circle me-2"></i>Add, edit, and manage patient information and records
+                            </p>
                         </div>
-                        <table class="table" v-if="lists.PATIENT">
-                            <thead>
-                                <tr>
-
-                                    <th scope="col">Full Name of Patient</th>
-                                    <th scope="col">Options</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="patient in lists.PATIENT.results">
-                                    <td>[[ patient.first_name ]] [[
-                                        patient.middle_name ]] [[
-                                        patient.last_name
-                                        ]]</td>
-                                    <td>
-
-                                        <button class="btn btn-warning"
-                                            @click="updatePatient(patient)">
-                                            Edit <i
-                                                class="fa-solid fa-pen-to-square">
-                                            </i>
-                                        </button>
-
-                                        <button class="btn btn-danger"
-                                            @click="deletePatient(patient)">
-                                            Delete <i
-                                                class="fa-solid fa-trash">
-                                            </i>
-                                        </button>
-
-                                        <button class="btn btn-info"
-                                            @click="viewPatientRecords(patient)">
-                                            View Records <i
-                                                class="fa-solid fa-eye">
-                                            </i>
-                                        </button>
-
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
                     </div>
-
                 </div>
-                <!-- Navigation Buttons -->
-                <div v-if="lists.PATIENT"
-                    class="d-flex justify-content-end mt-2">
-                    <button class="btn btn-primary me-2"
-                        :disabled="lists.PATIENT.previous === null"
-                        @click="switchPage('PREVIOUS')">
-                        <i class="fa-solid fa-left"></i> Previous
-                    </button>
-                    <button class="btn btn-primary me-2"
-                        :disabled="lists.PATIENT.next === null"
-                        @click="switchPage('NEXT')">
-                        Next <i class="fa-solid fa-right"></i>
-                    </button>
+
+                <!-- Patient Form Section -->
+                <div class="card dashboard-card border-0 mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="stat-icon bg-gradient-cardiologist text-white me-3">
+                                <i class="fa-solid fa-user-plus"></i>
+                            </div>
+                            <h5 class="mb-0" style="color: #2d3748; font-weight: 600;">Patient Information</h5>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-12 col-md-4">
+                                <label class="form-label fw-semibold">
+                                    First Name <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" 
+                                       v-model="props.PATIENT.first_name" 
+                                       class="form-control" 
+                                       :class="{'is-invalid': errors.first_name}"
+                                       placeholder="Enter first name"
+                                       @input="errors.first_name = false">
+                                <div v-if="errors.first_name" class="invalid-feedback">
+                                    First name is required
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <label class="form-label fw-semibold">Middle Name</label>
+                                <input type="text" 
+                                       v-model="props.PATIENT.middle_name" 
+                                       class="form-control" 
+                                       placeholder="Enter middle name (optional)">
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <label class="form-label fw-semibold">
+                                    Last Name <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" 
+                                       v-model="props.PATIENT.last_name" 
+                                       class="form-control" 
+                                       :class="{'is-invalid': errors.last_name}"
+                                       placeholder="Enter last name"
+                                       @input="errors.last_name = false">
+                                <div v-if="errors.last_name" class="invalid-feedback">
+                                    Last name is required
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-semibold">
+                                    Birth Date <span class="text-danger">*</span>
+                                </label>
+                                <input type="date" 
+                                       v-model="props.PATIENT.birth" 
+                                       class="form-control"
+                                       :class="{'is-invalid': errors.birth}"
+                                       :max="maxDate"
+                                       @input="errors.birth = false">
+                                <div v-if="errors.birth" class="invalid-feedback">
+                                    Valid birth date is required
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-semibold" style="opacity: 0;">Action</label>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-primary dashboard-btn flex-grow-1" @click="savePatient()">
+                                        <span v-if="state.PATIENT_UPDATE === true">
+                                            <i class="fa-solid fa-floppy-disk me-2"></i>Save Changes
+                                        </span>
+                                        <span v-else>
+                                            <i class="fa-solid fa-plus me-2"></i>Add Patient
+                                        </span>
+                                    </button>
+                                    <button v-if="state.PATIENT_UPDATE" class="btn btn-outline-secondary dashboard-btn" @click="clearPatientForm()" title="Clear Form">
+                                        <i class="fa-solid fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search & Filter Section -->
+                <div class="card dashboard-card border-0 mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="stat-icon bg-gradient-patient text-white me-3">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </div>
+                            <h5 class="mb-0" style="color: #2d3748; font-weight: 600;">Search & Filter</h5>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-12 col-md-4">
+                                <label class="form-label fw-semibold">First Name</label>
+                                <input type="text" v-model="search.first_name" class="form-control" placeholder="Search by first name">
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <label class="form-label fw-semibold">Middle Name</label>
+                                <input type="text" v-model="search.middle_name" class="form-control" placeholder="Search by middle name">
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <label class="form-label fw-semibold">Last Name</label>
+                                <input type="text" v-model="search.last_name" class="form-control" placeholder="Search by last name">
+                            </div>
+
+                            <div class="col-12">
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <button class="btn btn-primary dashboard-btn flex-grow-1" @click="filterPatient()">
+                                        <i class="fa-solid fa-search me-2"></i>Search Patient
+                                    </button>
+                                    <button class="btn btn-outline-secondary dashboard-btn flex-grow-1" @click="clearFilters()">
+                                        <i class="fa-solid fa-redo me-2"></i>Reset
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Patient List Section -->
+                <div class="card dashboard-card border-0">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center justify-content-between mb-4">
+                            <div>
+                                <h5 class="mb-1" style="color: #2d3748; font-weight: 600;">
+                                    <i class="fa-solid fa-list me-2"></i>Patient Records
+                                </h5>
+                                <p class="text-muted small mb-0">Manage all registered patients</p>
+                            </div>
+                        </div>
+
+                        <div v-if="loading_state.PATIENT" class="text-center py-5">
+                            {% include 'app/constants/loading.html' %}
+                        </div>
+
+                        <div v-else>
+                            <div class="table-responsive" v-if="lists.PATIENT">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead style="background-color: #f8fafc;">
+                                        <tr>
+                                            <th scope="col" class="fw-semibold text-muted">Patient ID</th>
+                                            <th scope="col" class="fw-semibold text-muted">Full Name</th>
+                                            <th scope="col" class="fw-semibold text-muted d-none d-lg-table-cell">Birth Date</th>
+                                            <th scope="col" class="fw-semibold text-muted text-end">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="patient in lists.PATIENT.results" :key="patient.id" style="border-bottom: 1px solid #e2e8f0;">
+                                            <td class="fw-medium">
+                                                <span class="text-primary">#[[ patient.id ]]</span>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-circle me-2">
+                                                        [[ patient.first_name.charAt(0) ]][[ patient.last_name.charAt(0) ]]
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-medium">[[ patient.first_name ]] [[ patient.middle_name ]] [[ patient.last_name ]]</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="d-none d-lg-table-cell text-muted">
+                                                <i class="fa-solid fa-calendar me-2"></i>[[ patient.birth ]]
+                                            </td>
+                                            <td class="text-end">
+                                                <div class="btn-group" role="group">
+                                                    <button class="btn btn-sm btn-primary dashboard-btn" @click="updatePatient(patient)" title="Edit Patient">
+                                                        <i class="fa-solid fa-pen-to-square"></i>
+                                                        <span class="d-none d-md-inline ms-1">Edit</span>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-info dashboard-btn" @click="viewPatientRecords(patient)" title="View Records">
+                                                        <i class="fa-solid fa-file-medical"></i>
+                                                        <span class="d-none d-md-inline ms-1">Records</span>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-danger dashboard-btn" @click="deletePatient(patient)" title="Delete Patient">
+                                                        <i class="fa-solid fa-trash"></i>
+                                                        <span class="d-none d-md-inline ms-1">Delete</span>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <!-- Empty State -->
+                                <div v-if="!lists.PATIENT.results || lists.PATIENT.results.length === 0" class="text-center py-5">
+                                    <i class="fa-solid fa-inbox" style="font-size: 3rem; color: #cbd5e0; margin-bottom: 1rem;"></i>
+                                    <p class="text-muted">No patients found</p>
+                                </div>
+                            </div>
+
+                            <!-- Pagination -->
+                            <div v-if="lists.PATIENT && lists.PATIENT.results && lists.PATIENT.results.length > 0" class="d-flex justify-content-between align-items-center mt-4 pt-3" style="border-top: 1px solid #e2e8f0;">
+                                <div class="text-muted small">
+                                    Showing [[ lists.PATIENT.results.length ]] of [[ lists.PATIENT.count ]] patients
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-outline-primary dashboard-btn" :disabled="lists.PATIENT.previous === null" @click="switchPage('PREVIOUS')">
+                                        <i class="fa-solid fa-chevron-left"></i>
+                                        <span class="d-none d-sm-inline ms-1">Previous</span>
+                                    </button>
+                                    <button class="btn btn-outline-primary dashboard-btn" :disabled="lists.PATIENT.next === null" @click="switchPage('NEXT')">
+                                        <span class="d-none d-sm-inline me-1">Next</span>
+                                        <i class="fa-solid fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
             </div>
         </div>
-
     </div>
-
 </div>
 
-<script>
+<style>
+    html, body {
+        height: 100%;
+        width: 100vw;
+        margin: 0;
+        padding: 0;
+        background: none;
+        overflow-x: hidden;
+    }
 
+    .dashboard-bg {
+        background: linear-gradient(135deg, #f8fafc 0%, #e0e7ef 100%);
+        min-height: 100vh;
+        min-width: 100vw;
+        width: 100vw;
+        position: relative;
+        overflow-x: hidden;
+    }
+
+    .dashboard-title {
+        color: #2d3748;
+        text-shadow: 1px 2px 8px rgba(255,95,109,0.08);
+    }
+
+    .dashboard-desc {
+        color: #4a5568;
+        opacity: 0.9;
+        font-size: 0.95rem;
+    }
+
+    .dashboard-header {
+        margin-bottom: 2rem;
+    }
+
+    .dashboard-card {
+        border-radius: 1.2rem;
+        background: #fff;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.10);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .dashboard-card:hover {
+        transform: translateY(-3px) scale(1.01);
+        box-shadow: 0 1.5rem 3rem rgba(255,95,109,0.10) !important;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        box-shadow: 0 2px 8px rgba(255,95,109,0.08);
+        flex-shrink: 0;
+    }
+
+    .bg-gradient-patient {
+        background: linear-gradient(90deg, #ff5f6d 0%, #ffc371 100%);
+    }
+
+    .bg-gradient-cardiologist {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .bg-gradient-dataset {
+        background: linear-gradient(90deg, #43cea2 0%, #185a9d 100%);
+    }
+
+    .avatar-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.875rem;
+        flex-shrink: 0;
+    }
+
+    .dashboard-btn {
+        border-radius: 0.7rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        padding: 0.5rem 1rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: #fff;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(90deg, #764ba2 0%, #667eea 100%) !important;
+        box-shadow: 0 0.5rem 1rem rgba(102,126,234,0.15);
+        transform: translateY(-2px);
+    }
+
+    .btn-info.dashboard-btn {
+        background: linear-gradient(90deg, #06b6d4 0%, #0891b2 100%);
+        border: none;
+        color: #fff;
+    }
+
+    .btn-info.dashboard-btn:hover {
+        background: linear-gradient(90deg, #0891b2 0%, #06b6d4 100%) !important;
+        box-shadow: 0 0.5rem 1rem rgba(6,182,212,0.15);
+        transform: translateY(-2px);
+    }
+
+    .btn-danger.dashboard-btn {
+        background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+        border: none;
+        color: #fff;
+    }
+
+    .btn-danger.dashboard-btn:hover {
+        background: linear-gradient(90deg, #dc2626 0%, #ef4444 100%) !important;
+        box-shadow: 0 0.5rem 1rem rgba(239,68,68,0.15);
+        transform: translateY(-2px);
+    }
+
+    .btn-outline-primary {
+        border-color: #667eea;
+        color: #667eea;
+    }
+
+    .btn-outline-primary:hover {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%) !important;
+        border-color: #667eea !important;
+        color: #fff !important;
+        box-shadow: 0 0.5rem 1rem rgba(102,126,234,0.15);
+        transform: translateY(-2px);
+    }
+
+    .btn-outline-primary:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .btn-outline-secondary {
+        border-radius: 0.7rem;
+        border-color: #d1d5db;
+        color: #6b7280;
+    }
+
+    .btn-outline-secondary:hover {
+        background: #f3f4f6;
+        border-color: #d1d5db;
+        color: #374151;
+    }
+
+    .form-control {
+        border-radius: 0.7rem;
+        border: 1px solid #e2e8f0;
+        font-size: 0.95rem;
+    }
+
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.15rem rgba(102,126,234,0.15);
+    }
+
+    .form-control:disabled {
+        background-color: #f3f4f6;
+        color: #9ca3af;
+    }
+
+    .form-control.is-invalid {
+        border-color: #ef4444;
+        padding-right: calc(1.5em + 0.75rem);
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23ef4444'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23ef4444' stroke='none'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right calc(0.375em + 0.1875rem) center;
+        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+
+    .form-control.is-invalid:focus {
+        border-color: #ef4444;
+        box-shadow: 0 0 0 0.15rem rgba(239, 68, 68, 0.25);
+    }
+
+    .invalid-feedback {
+        display: block;
+        margin-top: 0.25rem;
+        font-size: 0.875em;
+        color: #ef4444;
+    }
+
+    .text-danger {
+        color: #ef4444;
+    }
+
+    .form-label {
+        color: #2d3748;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table thead th {
+        border-bottom: 2px solid #e2e8f0;
+        padding: 1rem;
+        font-size: 0.875rem;
+    }
+
+    .table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f8fafc;
+        cursor: pointer;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .gap-2 {
+        gap: 0.5rem;
+    }
+
+    .gap-3 {
+        gap: 1rem;
+    }
+
+    @media (max-width: 991.98px) {
+        .dashboard-bg {
+            background: #fff;
+        }
+
+        .dashboard-title {
+            color: #212529;
+            text-shadow: none;
+            font-size: 1.75rem;
+        }
+
+        .dashboard-desc {
+            color: #6c757d !important;
+            font-size: 0.9rem;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 1.1rem;
+        }
+
+        .card-body {
+            padding: 1.25rem !important;
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        .dashboard-title {
+            font-size: 1.5rem;
+        }
+
+        .table {
+            font-size: 0.875rem;
+        }
+
+        .table thead th,
+        .table tbody td {
+            padding: 0.75rem 0.5rem;
+        }
+
+        .avatar-circle {
+            width: 32px;
+            height: 32px;
+            font-size: 0.7rem;
+        }
+
+        .dashboard-btn {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        .btn-sm {
+            padding: 0.375rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .btn-group {
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .form-label {
+            font-size: 0.875rem;
+        }
+
+        .form-control {
+            font-size: 0.9rem;
+            padding: 0.5rem 0.75rem;
+        }
+
+        .card-body {
+            padding: 1rem !important;
+        }
+
+        .row.g-3 > [class*="col-"] {
+            padding: 0.5rem;
+        }
+
+        .dashboard-header {
+            margin-bottom: 1.5rem;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .dashboard-title {
+            font-size: 1.25rem;
+        }
+
+        .dashboard-desc {
+            font-size: 0.85rem;
+        }
+
+        .dashboard-header {
+            margin-bottom: 1rem !important;
+        }
+
+        .container-fluid {
+            padding-left: 0.75rem !important;
+            padding-right: 0.75rem !important;
+        }
+
+        .card-body {
+            padding: 0.875rem !important;
+        }
+
+        .card {
+            margin-bottom: 1rem !important;
+        }
+
+        .table {
+            font-size: 0.8rem;
+        }
+
+        .table thead th,
+        .table tbody td {
+            padding: 0.5rem 0.25rem;
+        }
+
+        .btn {
+            font-size: 0.75rem;
+            padding: 0.5rem 0.5rem;
+        }
+
+        .btn i {
+            font-size: 0.7rem;
+            margin-right: 0.25rem !important;
+            margin-left: 0.25rem !important;
+        }
+
+        .btn span {
+            display: none;
+        }
+
+        .btn-group {
+            gap: 0.25rem;
+        }
+
+        .stat-icon {
+            width: 36px;
+            height: 36px;
+            font-size: 1rem;
+        }
+
+        .form-label {
+            font-size: 0.8rem;
+        }
+
+        .form-control {
+            font-size: 0.875rem;
+            padding: 0.5rem;
+        }
+
+        .row.g-3 > [class*="col-"] {
+            padding: 0.25rem;
+        }
+
+        .row.g-3 {
+            --bs-gutter-y: 0.75rem;
+        }
+    }
+</style>
+
+<script>
 new Vue({
     delimiters: ["[[", "]]"],
     el: "#" + '{{ obj_name }}',
     data: {
-
         loading_state: {},
         lists: {},
         url_models: {},
         endpoints: {},
-
+        search: {
+            'first_name': '',
+            'middle_name': '',
+            'last_name': ''
+        },
+        errors: {
+            first_name: false,
+            last_name: false,
+            birth: false
+        },
         state: {
             'PATIENT_UPDATE': false,
             'PATIENT_ID': null,
             'PREDICTION_ID': null,
             'ACTIVE_GRAPH': null,
-            'NOTES': ''
+            'NOTES': '',
+            'PREDICTION_RESULT': {
+                show: false,
+                result: '',
+                condition: '',
+                is_normal: false,
+                is_strong: false,
+                message: ''
+            }
         },
-
         props: {
-
             'PATIENT': {
                 "first_name": null,
                 "middle_name": '',
                 "last_name": null,
                 "birth": null
             },
-
-            'PREDICTION' :  {
+            'PREDICTION': {
                 "recommendations": "",
             }
-
         },
-
         info: {
             'MESSAGE': 'Sample Message',
             'TITLE': 'Sample Title'
         },
-
+    },
+    computed: {
+        maxDate() {
+            const today = new Date()
+            return today.toISOString().split('T')[0]
+        }
     },
     mounted() {
+        if (document.querySelector("#" + '{{ obj_name }}')) {
+            console.log("Mounted " + '{{ obj_name }}' + " page.")
+        }
+        
+        // Initialize models
         initializeModels(this, ['PATIENT', 'PREDICTION'])
+        
+        // Log endpoints for debugging
+        console.log('Initialized endpoints:', this.endpoints)
+        console.log('Initialized url_models:', this.url_models)
+        
+        // Load initial data
         universalGet(this, 'LIST_GET', 'PATIENT', 'PATIENT', 'PATIENT', {page: 1})
         universalGet(this, 'LIST_GET', 'PREDICTION', 'PREDICTION', 'PREDICTION', {page: 1})
     },
     methods: {
-
         downloadCSV(prediction) {
             window.location.href = '/download/' + prediction.id + '/'
         },
+        
         plotJS(props) {
-      
             try {
-
+                console.log('plotJS called with:', props);
+                
+                if (!props || !props.rates) {
+                    console.error('Invalid props passed to plotJS:', props);
+                    return;
+                }
+                
                 let data = props;
+                console.log('ECG rates data:', data.rates);
+                console.log('ECG rates length:', data.rates.length);
+                
+                if (!data.rates || data.rates.length === 0) {
+                    console.error('No ECG data rates to plot');
+                    return;
+                }
+                
                 let xValues = [...Array(data.rates.length).keys()];
                 let yValues = data.rates;
         
@@ -240,47 +752,126 @@ new Vue({
                     x: xValues,
                     y: yValues,
                     mode: 'lines',
-                    line: { color: 'blue' }
+                    line: { color: '#667eea', width: 2 }
                 };
 
                 let layout = {
                     title: 'ECG-Style Graph',
                     xaxis: { title: 'Time' },
-                    yaxis: { title: 'Amplitude' }
+                    yaxis: { title: 'Amplitude' },
+                    plot_bgcolor: '#f8fafc',
+                    paper_bgcolor: '#f8fafc',
+                    autosize: true
                 };
 
+                console.log('Rendering Plotly graph to #ecg-graph');
+                const graphDiv = document.getElementById('ecg-graph');
+                if (!graphDiv) {
+                    console.error('Graph div #ecg-graph not found!');
+                    return;
+                }
+                console.log('Graph div dimensions:', graphDiv.offsetWidth, 'x', graphDiv.offsetHeight);
+                
                 Plotly.newPlot('ecg-graph', [trace], layout);
+                console.log('Plotly graph rendered successfully');
             } catch (error) {
-                console.error("Error fetching ECG data:", error);
+                console.error("Error in plotJS:", error);
             }
 
             this.info.TITLE = 'Showing Graph'
-            
         },
 
         async viewGraph(props) {
-          
-            closeModal('patient_records_modal')
-            console.log(props)
+            console.log('viewGraph called with props:', props);
+            
+            // Set data first
             this.state.NOTES = props.recommendations
-            this.plotJS(JSON.parse(props.sequential_ecg))
             this.state.PREDICTION_ID = props.id
-            openModal('graph_modal')
+            
+            // Set prediction results
+            const remarks = props.remarks || '';
+            const isNormal = remarks.toLowerCase().includes('normal');
+            
+            // Calculate average rate from sequential ECG data
+            console.log('Raw sequential_ecg:', props.sequential_ecg);
+            console.log('Type of sequential_ecg:', typeof props.sequential_ecg);
+            
+            let ecgData;
+            try {
+                // Parse the JSON string if needed
+                let parsedData = typeof props.sequential_ecg === 'string' 
+                    ? JSON.parse(props.sequential_ecg) 
+                    : props.sequential_ecg;
+                console.log('Parsed data:', parsedData);
+                
+                // Check if it's an object with a 'rates' property
+                if (parsedData && typeof parsedData === 'object' && parsedData.rates) {
+                    ecgData = parsedData.rates;
+                    console.log('Extracted rates array from object');
+                } else if (Array.isArray(parsedData)) {
+                    ecgData = parsedData;
+                    console.log('Data is already an array');
+                } else {
+                    console.error('Unexpected data structure:', parsedData);
+                    ecgData = [];
+                }
+            } catch (e) {
+                console.error('Error parsing ECG data:', e);
+                ecgData = [];
+            }
+            
+            console.log('Final ecgData array:', ecgData);
+            console.log('ECG data length:', ecgData.length);
+            
+            const avgRate = ecgData.length > 0 ? ecgData.reduce((a, b) => a + b, 0) / ecgData.length : 0;
+            const isStrong = avgRate > 500 && !remarks.toLowerCase().includes('weak');
+            
+            // Store ECG data in state for plotting
+            this.state.ECG_DATA = ecgData;
+            console.log('Stored in state.ECG_DATA:', this.state.ECG_DATA);
+            
+            this.state.PREDICTION_RESULT = {
+                show: true,
+                result: isNormal ? 'Normal' : 'Arrhythmia',
+                condition: isStrong ? 'Strong' : 'Weak',
+                is_normal: isNormal,
+                is_strong: isStrong,
+                message: props.message || remarks
+            };
+            
+            // Close current modal and open graph modal with delay
+            closeModal('patient_records_modal')
+            setTimeout(() => {
+                openModal('graph_modal')
+                // Plot the graph after modal is opened so Plotly can calculate dimensions
+                setTimeout(() => {
+                    console.log('Plotting ECG data:', this.state.ECG_DATA);
+                    if (this.state.ECG_DATA && this.state.ECG_DATA.length > 0) {
+                        this.plotJS({ rates: this.state.ECG_DATA })
+                    } else {
+                        console.error('No ECG data to plot');
+                    }
+                }, 150)
+            }, 300)
         },
 
         async viewPrescription() {
-
             window.open('/prescription/' + String(this.state.PREDICTION_ID) + '/', '_blank');
-
             this.props.PREDICTION.recommendations = ''
             this.state.PREDICTION_ID = null
             this.state.NOTES = ''
+            this.state.PREDICTION_RESULT = {
+                show: false,
+                result: '',
+                condition: '',
+                is_normal: false,
+                is_strong: false,
+                message: ''
+            };
             closeModal('graph_modal')
-            
         },
 
         async updatePrescription() {
-            const url = '/get-update-destroy/prediction/'
             this.props.PREDICTION.recommendations = this.state.NOTES
 
             const result = await universalPatch(this, 'GET_UPDATE_DESTROY', 
@@ -290,8 +881,15 @@ new Vue({
             this.props.PREDICTION.recommendations = ''
             this.state.PREDICTION_ID = null
             this.state.NOTES = ''
-            closeModalw('graph_modal')
-            
+            this.state.PREDICTION_RESULT = {
+                show: false,
+                result: '',
+                condition: '',
+                is_normal: false,
+                is_strong: false,
+                message: ''
+            };
+            closeModal('graph_modal')
         },
 
         async viewPatientRecords(props) {
@@ -302,73 +900,60 @@ new Vue({
         },
 
         async clearFilters() {
+            this.info.TITLE = ''
+            this.info.MESSAGE = ''
 
-        this.info.TITLE = ''
-        this.info.MESSAGE = ''
+            this.search = {
+                'first_name': '',
+                'middle_name': '',
+                'last_name': ''
+            }
 
-        this.props.PATIENT = {
-            "first_name": null,
-            "middle_name": '',
-            "last_name": null,
-            "birth": null
-        };
+            this.props.PATIENT = {
+                "first_name": null,
+                "middle_name": '',
+                "last_name": null,
+                "birth": null
+            };
 
-        this.state.PATIENT_UPDATE = false
-        this.state.PATIENT_ID = null
-        this.state.PREDICTION_ID = null
-        this.state.ACTIVE_GRAPH = null
+            this.state.PATIENT_UPDATE = false
+            this.state.PATIENT_ID = null
+            this.state.PREDICTION_ID = null
+            this.state.ACTIVE_GRAPH = null
 
-        await universalGet(
-          this,
-          "LIST_GET",
-          "PATIENT",
-          "PATIENT",
-          "PATIENT",
-          this.getFilters()
-        );
-        this.state.SELECTED_PATIENT = false;
-      },
+            await universalGet(this, "LIST_GET", "PATIENT", "PATIENT", "PATIENT", {page: 1});
+        },
 
         async filterPatient() {
-            this.state.SELECTED_PATIENT = false;
-            await universalGet(
-            this,
-            "LIST_GET",
-            "PATIENT",
-            "PATIENT",
-            "PATIENT",
-            this.getFilters()
-            );
+            const filters = this.getFilters();
+            await universalGet(this, "LIST_GET", "PATIENT", "PATIENT", "PATIENT", filters);
             if (this.lists.PATIENT) {
-            if (this.lists.PATIENT.count < 1) {
-                this.info.MESSAGE = "Oh no! No results found.";
-                this.info.TITLE = "Notification";
-                openModal("message_modal");
-                this.clearFilters();
-            }
+                if (this.lists.PATIENT.count < 1) {
+                    this.info.MESSAGE = "Oh no! No results found.";
+                    this.info.TITLE = "Notification";
+                    openModal("message_modal");
+                    await this.clearFilters();
+                }
             }
         },
 
         getFilters() {
-        const filters = { page: 1 };
+            const filters = { page: 1 };
 
-        if (this.props.PATIENT.first_name !== "" && this.props.PATIENT.first_name !== null) {
-          filters["first_name"] = this.props.PATIENT.first_name;
-        }
+            if (this.search.first_name !== "" && this.search.first_name !== null) {
+                filters["first_name"] = this.search.first_name;
+            }
 
-        if (
-          this.props.PATIENT.middle_name !== "" &&
-          this.props.PATIENT.middle_name !== null
-        ) {
-          filters["middle_name"] = this.props.PATIENT.middle_name;
-        }
+            if (this.search.middle_name !== "" && this.search.middle_name !== null) {
+                filters["middle_name"] = this.search.middle_name;
+            }
 
-        if (this.props.PATIENT.last_name !== "" && this.props.PATIENT.last_name !== null) {
-          filters["last_name"] = this.props.PATIENT.last_name;
-        }
+            if (this.search.last_name !== "" && this.search.last_name !== null) {
+                filters["last_name"] = this.search.last_name;
+            }
 
-        return filters;
-      },
+            return filters;
+        },
         
         setInfo(title, message) {
             this.info.MESSAGE = message
@@ -376,89 +961,189 @@ new Vue({
         },
 
         clearPatientForm() {
-
-            this.props.PATIENT.first_name = null
-            this.props.PATIENT.middle_name = ''
-            this.props.PATIENT.last_name = null
-            this.props.PATIENT.birth = null
+            console.log('Clearing patient form')
+            this.props.PATIENT = {
+                "first_name": null,
+                "middle_name": '',
+                "last_name": null,
+                "birth": null
+            }
             this.state.PATIENT_ID = null
-
+            this.state.PATIENT_UPDATE = false
+            this.errors = {
+                first_name: false,
+                last_name: false,
+                birth: false
+            }
+            console.log('Form cleared. Update mode:', this.state.PATIENT_UPDATE, 'Patient ID:', this.state.PATIENT_ID)
         },
 
         updatePatient(property) {
-
-            this.state.PATIENT_UPDATE = true // Set Mark as True to Enable Updating
-            this.props.PATIENT = property
+            console.log('Setting up patient update for:', property)
+            this.state.PATIENT_UPDATE = true
+            this.props.PATIENT = { ...property }
             this.state.PATIENT_ID = property.id
-
+            console.log('Update mode set. Patient ID:', this.state.PATIENT_ID)
+            
+            // Scroll to form
+            window.scrollTo({ top: 0, behavior: 'smooth' })
         },
 
         async deletePatient(props) {
-
             this.state.PATIENT_ID = props.id
-            const result = await universalDelete(this,
-            'GET_UPDATE_DESTROY',
-            'PATIENT',
-            'PATIENT',
-            'PATIENT', 'PATIENT_ID')
+            const result = await universalDelete(this, 'GET_UPDATE_DESTROY', 'PATIENT', 'PATIENT', 'PATIENT', 'PATIENT_ID')
 
             if (result) {
                 this.setInfo('Notification', 'Patient was removed from the records.')
                 openModal('message_modal')
+                await universalGet(this, 'LIST_GET', 'PATIENT', 'PATIENT', 'PATIENT', {page: 1})
             }
+        },
+
+        validatePatientForm() {
+            let isValid = true
             
+            // Reset errors
+            this.errors = {
+                first_name: false,
+                last_name: false,
+                birth: false
+            }
+
+            // Validate required fields
+            if (!this.props.PATIENT.first_name || this.props.PATIENT.first_name.trim() === '') {
+                this.errors.first_name = true
+                isValid = false
+            }
+
+            if (!this.props.PATIENT.last_name || this.props.PATIENT.last_name.trim() === '') {
+                this.errors.last_name = true
+                isValid = false
+            }
+
+            if (!this.props.PATIENT.birth || this.props.PATIENT.birth === '') {
+                this.errors.birth = true
+                isValid = false
+            }
+
+            if (!isValid) {
+                this.setInfo('Validation Error', 'Please fill in all required fields.')
+                openModal('message_modal')
+                return false
+            }
+
+            // Validate birth date is not in the future
+            const birthDate = new Date(this.props.PATIENT.birth)
+            const today = new Date()
+            today.setHours(0, 0, 0, 0)
+            
+            if (birthDate > today) {
+                this.errors.birth = true
+                this.setInfo('Validation Error', 'Birth date cannot be in the future.')
+                openModal('message_modal')
+                return false
+            }
+
+            return true
         },
 
         async savePatient() {
-
-            if (this.state.PATIENT_UPDATE === true) {
-
-                const result = await universalPatch(this, 'GET_UPDATE_DESTROY', 
-                'PATIENT', 'PATIENT', 'PATIENT', 
-                'PATIENT_ID', 'PATIENT')
-                
-                if (result) {
-                    this.setInfo('Notification', 'Successful update.')
-                    openModal('message_modal')
-                    this.clearPatientForm()
-                }
-
-            } else {
-
-                const result = await universalPost(this, 'LIST_CREATE', 'PATIENT', null, null, this.props.PATIENT)
-                
-                if (result) {
-                    this.setInfo('Notification', 'New patient was recorded.')
-                    openModal('message_modal')        
-                }
-
-                this.clearPatientForm()
-            }
-
-            this.state.PATIENT_UPDATE = false // Set Mark as False so whenever save is pressed it will just insert.
-        },
-
-        // Object Calls.
-        async switchPage (option) {
-
-            var action = ''
+            console.log('=== Save Patient Debug ===')
+            console.log('Current patient data:', JSON.stringify(this.props.PATIENT, null, 2))
+            console.log('Update mode:', this.state.PATIENT_UPDATE)
+            console.log('Patient ID:', this.state.PATIENT_ID)
+            console.log('All endpoints:', this.endpoints)
+            console.log('URL models:', this.url_models)
             
-            if (option === 'NEXT') {
-                action = this.lists.PATIENT.next
-            } else if (option === 'PREVIOUS') {
-                action = ensurePageParam(this.lists.PATIENT.previous )
+            // Validate form before submission
+            if (!this.validatePatientForm()) {
+                return
             }
 
-            await universalGet(this, 
-                'LIST_GET', 
-                'PATIENT', 
-                'PATIENT', 
-                'PATIENT', 
-                null,
-                action)
+            try {
+                // Check if we're really in update mode (both flag AND id must be present)
+                const isUpdateMode = this.state.PATIENT_UPDATE === true && this.state.PATIENT_ID !== null && this.state.PATIENT_ID !== undefined
+                
+                console.log('Is update mode?', isUpdateMode)
+
+                if (isUpdateMode) {
+                    // Update existing patient
+                    console.log('=== UPDATING PATIENT ===')
+                    console.log('Patient ID:', this.state.PATIENT_ID)
+                    
+                    const result = await universalPatch(this, 
+                        'GET_UPDATE_DESTROY', 
+                        'PATIENT', 
+                        'PATIENT', 
+                        'PATIENT', 
+                        'PATIENT_ID', 
+                        'PATIENT')
+                    
+                    console.log('Update result:', result)
+                    
+                    if (result) {
+                        this.setInfo('Success', 'Patient information updated successfully.')
+                        openModal('message_modal')
+                        await universalGet(this, 'LIST_GET', 'PATIENT', 'PATIENT', 'PATIENT', {page: 1})
+                        this.clearPatientForm()
+                    } else {
+                        this.setInfo('Error', 'Failed to update patient. Please try again.')
+                        openModal('message_modal')
+                    }
+                } else {
+                    // Add new patient - use direct axios call
+                    console.log('=== ADDING NEW PATIENT ===')
+
+                    // Force clear update state
+                    this.state.PATIENT_UPDATE = false
+                    this.state.PATIENT_ID = null
+
+                    // Prepare patient data
+                    const patientData = {
+                        first_name: this.props.PATIENT.first_name.trim(),
+                        middle_name: this.props.PATIENT.middle_name ? this.props.PATIENT.middle_name.trim() : '',
+                        last_name: this.props.PATIENT.last_name.trim(),
+                        birth: this.props.PATIENT.birth
+                    }
+
+                    console.log('Patient data to send:', patientData)
+
+                    // Get CSRF token
+                    const csrftoken = getCookie("csrftoken")
+                    axios.defaults.headers.common["X-CSRFToken"] = csrftoken
+
+                    // Use the correct endpoint for patient creation
+                    const apiUrl = '/api/list-create/patient/'
+                    try {
+                        const response = await axios.post(apiUrl, patientData)
+                        console.log('Success response:', response)
+
+                        this.setInfo('Success', 'Patient added successfully.')
+                        openModal('message_modal')
+                        await universalGet(this, 'LIST_GET', 'PATIENT', 'PATIENT', 'PATIENT', {page: 1})
+                        this.clearPatientForm()
+                    } catch (error) {
+                        console.error(`Error with ${apiUrl}:`, error.response?.status || error.message)
+                        this.setInfo('Error', 'Could not create patient. Please check server configuration.')
+                        openModal('message_modal')
+                    }
+                }
+            } catch (error) {
+                console.error('Error saving patient:', error)
+                console.error('Error stack:', error.stack)
+                this.setInfo('Error', 'An error occurred: ' + (error.message || 'Unknown error'))
+                openModal('message_modal')
+            }
         },
 
-    },
+        async switchPage(direction) {
+            const url = direction === 'NEXT' ? this.lists.PATIENT.next : this.lists.PATIENT.previous;
+            if (url) {
+                await universalGet(this, 'LIST_GET', 'PATIENT', 'PATIENT', 'PATIENT', null, url);
+            }
+        }
+    }
 });
 </script>
+
 {% endblock %}

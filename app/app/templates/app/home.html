@@ -3,73 +3,616 @@
 {% load crispy_forms_tags %}
 {% block content %}
 
-<div id="{{ obj_name }}">
+<div id="{{ obj_name }}" class="dashboard-bg w-100 h-100" style="min-height:100vh;width:100vw;overflow-x:hidden;">
+    <div class="container-fluid pt-5 px-3 px-md-5" style="max-width:100vw; margin-top: 4.5rem;">
+            <!-- Header Section -->
+            <div class="dashboard-header mb-4">
+                <div class="row align-items-center">
+                    <div class="col-12 col-md-6">
+                        <h2 class="fw-bold mb-2 dashboard-title">Dashboard Overview</h2>
+                        <p class="dashboard-desc mb-0">Welcome back! Here's what's happening today.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Statistics Cards -->
+            <div class="row g-4 mb-4">
+                <!-- Patients Card -->
+                <div class="col-12 col-md-6 col-xl-3">
+                    <div class="stat-card card h-100 border-0 dashboard-card">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="stat-icon bg-gradient-patient text-white">
+                                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z"/>
+                                    </svg>
+                                </div>
+                                <span class="badge bg-gradient-patient text-white">Active</span>
+                            </div>
+                            <div>
+                                <h3 class="stat-number mb-2">{{ patients }}</h3>
+                                <h6 class="stat-label text-muted mb-2">Total Patients</h6>
+                                <p class="stat-description text-muted small mb-0">
+                                    Registered patients in the system
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Cardiologists Card -->
+                <div class="col-12 col-md-6 col-xl-3">
+                    <div class="stat-card card h-100 border-0 dashboard-card">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="stat-icon bg-gradient-cardiologist text-white">
+                                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm.256 7a4.474 4.474 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10c.26 0 .507.009.74.025.226-.341.496-.65.804-.918C9.077 9.038 8.564 9 8 9c-5 0-6 3-6 4s1 1 1 1h5.256Z"/>
+                                        <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0Z"/>
+                                    </svg>
+                                </div>
+                                <span class="badge bg-gradient-cardiologist text-white">Available</span>
+                            </div>
+                            <div>
+                                <h3 class="stat-number mb-2">{{ cardiologists }}</h3>
+                                <h6 class="stat-label text-muted mb-2">Cardiologists</h6>
+                                <p class="stat-description text-muted small mb-0">
+                                    Registered and available specialists
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Datasets Card -->
+                <div class="col-12 col-md-6 col-xl-3">
+                    <div class="stat-card card h-100 border-0 dashboard-card">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="stat-icon bg-gradient-dataset text-white">
+                                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z"/>
+                                    </svg>
+                                </div>
+                                <span class="badge bg-gradient-dataset text-white">Ready</span>
+                            </div>
+                            <div>
+                                <h3 class="stat-number mb-2">{{ datasets }}</h3>
+                                <h6 class="stat-label text-muted mb-2">Available Datasets</h6>
+                                <p class="stat-description text-muted small mb-0">
+                                    Total datasets ready for analysis
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Predictions Card -->
+                <div class="col-12 col-md-6 col-xl-3">
+                    <div class="stat-card card h-100 border-0 dashboard-card">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="stat-icon bg-gradient-prediction text-white">
+                                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+                                    </svg>
+                                </div>
+                                <span class="badge bg-gradient-prediction text-white">Total</span>
+                            </div>
+                            <div>
+                                <h3 class="stat-number mb-2">{{ predictions }}</h3>
+                                <h6 class="stat-label text-muted mb-2">Total Predictions</h6>
+                                <p class="stat-description text-muted small mb-0">
+                                    ECG predictions performed
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    <div class="row">
-        <div class="col-lg-6">
-            <div class="card text">
-                <div class="card-body">
-                    <h5 class="card-title fw-bold">Number of Patient(s):
-                        {{ patients }}</h5>
-                    <p class="card-text">Total Patient(s) in the system.</p>
+            <!-- Analytics Section -->
+            <div class="row g-4 mb-4">
+                <!-- Arrhythmia Analytics Card -->
+                <div class="col-12 col-lg-8">
+                    <div class="dashboard-card card border-0 h-100">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h5 class="fw-bold mb-0">
+                                    <svg width="22" height="22" fill="currentColor" class="me-2 text-danger" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                        <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z"/>
+                                        <circle cx="8" cy="4.5" r="1"/>
+                                    </svg>
+                                    Arrhythmia Distribution by Age & Month
+                                </h5>
+                                {% if arrhythmia_analytics.total_patients > 0 %}
+                                <span class="badge bg-danger fs-6 px-3 py-2">{{ arrhythmia_analytics.total_patients }} Patients</span>
+                                {% endif %}
+                            </div>
+                            
+                            {% if arrhythmia_analytics.has_data %}
+                            <div class="arrhythmia-timeline">
+                                {% for month_data in arrhythmia_analytics.monthly_data %}
+                                <div class="month-section mb-4">
+                                    <div class="month-header bg-gradient-danger text-white p-3 rounded-3 mb-3 d-flex justify-content-between align-items-center">
+                                        <div class="d-flex align-items-center">
+                                            <svg width="20" height="20" fill="currentColor" class="me-2" viewBox="0 0 16 16">
+                                                <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                                            </svg>
+                                            <h6 class="mb-0 fw-bold">{{ month_data.month }}</h6>
+                                        </div>
+                                        <span class="badge bg-white text-danger fw-bold px-3 py-2">{{ month_data.total }} Total</span>
+                                    </div>
+                                    
+                                    <div class="age-groups-container">
+                                        {% for age_group in month_data.age_groups %}
+                                        <div class="age-group-card mb-3 border rounded-3 shadow-sm">
+                                            <div class="age-group-header bg-light p-3 border-bottom d-flex justify-content-between align-items-center">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="age-icon me-2">
+                                                        <svg width="18" height="18" fill="currentColor" class="text-primary" viewBox="0 0 16 16">
+                                                            <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z"/>
+                                                        </svg>
+                                                    </div>
+                                                    <h6 class="mb-0 fw-semibold text-dark">Age {{ age_group.age_group }} years</h6>
+                                                </div>
+                                                <span class="badge bg-primary px-3 py-2">{{ age_group.total }} patient{{ age_group.total|pluralize }}</span>
+                                            </div>
+                                            <div class="arrhythmia-list-compact p-3">
+                                                {% for arrhythmia in age_group.arrhythmias %}
+                                                <div class="arrhythmia-section mb-3">
+                                                    <div class="arrhythmia-header d-flex justify-content-between align-items-center mb-2 p-2 border-start border-3 rounded-2 {% if 'Normal' in arrhythmia.type %}border-success bg-success{% else %}border-danger bg-danger{% endif %} bg-opacity-10">
+                                                        <div class="d-flex align-items-center">
+                                                            <span class="arrhythmia-dot me-2 {% if 'Normal' in arrhythmia.type %}bg-success{% else %}bg-danger{% endif %}"></span>
+                                                            <span class="fw-bold text-dark small">{{ arrhythmia.type }}</span>
+                                                        </div>
+                                                        <span class="badge {% if 'Normal' in arrhythmia.type %}bg-success{% else %}bg-danger{% endif %} px-2 py-1">{{ arrhythmia.count }} patient{{ arrhythmia.count|pluralize }}</span>
+                                                    </div>
+                                                    <div class="patient-list ps-4">
+                                                        {% for patient in arrhythmia.patients %}
+                                                        <div class="patient-item d-flex align-items-center justify-content-between py-2 px-3 mb-1 bg-white border rounded-2 shadow-sm">
+                                                            <div class="d-flex align-items-center">
+                                                                <svg width="14" height="14" fill="currentColor" class="text-secondary me-2" viewBox="0 0 16 16">
+                                                                    <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z"/>
+                                                                </svg>
+                                                                <span class="text-dark fw-medium small">{{ patient.name }}</span>
+                                                            </div>
+                                                            <div class="d-flex align-items-center">
+                                                                <span class="badge bg-light text-dark border me-2 small">{{ patient.age }}</span>
+                                                                <span class="text-muted small">{{ patient.date }}</span>
+                                                            </div>
+                                                        </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="text-center py-5">
+                                <svg width="64" height="64" fill="currentColor" class="text-muted mb-3" viewBox="0 0 16 16">
+                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 1 8 0a8 8 0 0 1 0 16z"/>
+                                    <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                                </svg>
+                                <p class="text-muted mb-0">No patient data recorded yet</p>
+                                <small class="text-muted">Patient data will appear here once diagnoses are made</small>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Age Demographics Card -->
+                <div class="col-12 col-lg-4">
+                    <div class="dashboard-card card border-0 h-100">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold mb-3">
+                                <svg width="20" height="20" fill="currentColor" class="me-2" viewBox="0 0 16 16">
+                                    <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm.256 7a4.474 4.474 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10c.343 0 .677.023 1 .066.543-.94 1.563-1.613 2.754-1.75C10.574 8.116 9.35 8 8 8c-5 0-6 3-6 4s1 1 1 1h5.256Z"/>
+                                </svg>
+                                Patient Age Demographics
+                            </h5>
+                            <div class="text-center mb-4">
+                                <h2 class="display-4 fw-bold text-primary mb-0">{{ age_demographics.average_age }}</h2>
+                                <p class="text-muted small">Average Patient Age</p>
+                            </div>
+                            <div class="mb-3">
+                                <canvas id="ageChart" height="200"></canvas>
+                            </div>
+                            <div class="mt-3 row g-2">
+                                {% for label, value in age_demographics.age_groups.items %}
+                                <div class="col-6">
+                                    <div class="p-2 bg-light rounded text-center">
+                                        <div class="fw-bold text-primary">{{ value }}</div>
+                                        <div class="small text-muted">{{ label }} years</div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <div class="col-lg-6">
-            <div class="card text">
-                <div class="card-body">
-                    <h5 class="card-title fw-bold">Number of
-                        Cardiologist(s): {{ cardiologists }}</h5>
-                    <p class="card-text">Cardiologist's available and
-                        registered.</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="mt-4 col-lg-12">
-            <div class="card text">
-                <div class="card-body">
-                    <h5 class="card-title fw-bold">Number of
-                        Dataset(s) Available: {{ datasets }}</h5>
-                    <p class="card-text">Available dataset(s) in the system.</p>
-                </div>
-            </div>
-        </div>
-
     </div>
-
 </div>
 
-<script>
+<style>
+    html, body {
+        height: 100%;
+        width: 100vw;
+        margin: 0;
+        padding: 0;
+        background: none;
+        overflow-x: hidden;
+    }
+    .dashboard-bg {
+        background: linear-gradient(135deg, #f8fafc 0%, #e0e7ef 100%);
+        min-height: 100vh;
+        min-width: 100vw;
+        width: 100vw;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 0;
+        overflow-x: hidden;
+    }
+    #{{ obj_name }} {
+        min-height: 100vh;
+        min-width: 100vw;
+        width: 100vw;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 0;
+        overflow-x: hidden;
+    }
+    .dashboard-title {
+        color: #2d3748;
+        text-shadow: 1px 2px 8px rgba(255,95,109,0.08);
+    }
+    .dashboard-desc {
+        color: #4a5568;
+        opacity: 0.9;
+    }
+    .dashboard-card {
+        border-radius: 1.2rem;
+        background: #fff;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.10);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .dashboard-card:hover {
+        transform: translateY(-3px) scale(1.01);
+        box-shadow: 0 1.5rem 3rem rgba(255,95,109,0.10)!important;
+    }
+    .stat-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        box-shadow: 0 2px 8px rgba(255,95,109,0.08);
+    }
+    .bg-gradient-patient {
+        background: linear-gradient(90deg, #ff5f6d 0%, #ffc371 100%);
+    }
+    .bg-gradient-cardiologist {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    }
+    .bg-gradient-dataset {
+        background: linear-gradient(90deg, #43cea2 0%, #185a9d 100%);
+    }
+    .bg-gradient-prediction {
+        background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+    }
+    .bg-gradient-danger {
+        background: linear-gradient(135deg, #ff5f6d 0%, #ffc371 100%);
+    }
+    .letter-spacing {
+        letter-spacing: 0.05em;
+    }
+    .chart-container {
+        position: relative !important;
+        height: 280px !important;
+        width: 100% !important;
+        margin: 0 auto;
+        padding: 1rem 0;
+    }
+    .chart-container canvas {
+        max-height: 280px !important;
+    }
+    .arrhythmia-list {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    .arrhythmia-list::-webkit-scrollbar {
+        width: 6px;
+    }
+    .arrhythmia-list::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+    .arrhythmia-list::-webkit-scrollbar-thumb {
+        background: #ff5f6d;
+        border-radius: 10px;
+    }
+    .arrhythmia-list::-webkit-scrollbar-thumb:hover {
+        background: #ffc371;
+    }
+    .arrhythmia-item {
+        transition: all 0.3s ease;
+        border-left: 4px solid #ff5f6d !important;
+    }
+    .arrhythmia-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 12px rgba(255, 95, 109, 0.15) !important;
+        background: #fff !important;
+    }
+    .arrhythmia-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+        box-shadow: 0 0 8px rgba(255, 95, 109, 0.4);
+    }
+    .arrhythmia-timeline {
+        max-height: 600px;
+        overflow-y: auto;
+        padding-right: 0.5rem;
+    }
+    .arrhythmia-timeline::-webkit-scrollbar {
+        width: 6px;
+    }
+    .arrhythmia-timeline::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+    .arrhythmia-timeline::-webkit-scrollbar-thumb {
+        background: #ff5f6d;
+        border-radius: 10px;
+    }
+    .arrhythmia-timeline::-webkit-scrollbar-thumb:hover {
+        background: #ffc371;
+    }
+    .month-section {
+        animation: fadeIn 0.5s ease-in;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .month-header {
+        background: linear-gradient(135deg, #ff5f6d 0%, #ffc371 100%) !important;
+        box-shadow: 0 4px 12px rgba(255, 95, 109, 0.2);
+    }
+    .age-group-card {
+        transition: all 0.3s ease;
+        background: #fff;
+    }
+    .age-group-card:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+    }
+    .arrhythmia-list-compact {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    .arrhythmia-list-compact::-webkit-scrollbar {
+        width: 4px;
+    }
+    .arrhythmia-list-compact::-webkit-scrollbar-track {
+        background: #f8f9fa;
+    }
+    .arrhythmia-list-compact::-webkit-scrollbar-thumb {
+        background: #dee2e6;
+        border-radius: 4px;
+    }
+    .arrhythmia-section {
+        margin-bottom: 1rem;
+    }
+    .arrhythmia-header {
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .arrhythmia-header:hover {
+        transform: translateX(3px);
+    }
+    .patient-list {
+        animation: slideDown 0.3s ease-out;
+    }
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .patient-item {
+        transition: all 0.2s ease;
+        font-size: 0.85rem;
+    }
+    .patient-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+        background: #f8f9fa !important;
+    }
+    .arrhythmia-item-compact {
+        transition: all 0.2s ease;
+    }
+    .arrhythmia-item-compact:hover {
+        transform: translateX(3px);
+    }
+    .arrhythmia-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+        box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+    }
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #2d3748;
+        line-height: 1;
+    }
+    .stat-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        letter-spacing: 0.025em;
+        text-transform: uppercase;
+    }
+    .stat-description {
+        font-size: 0.875rem;
+        line-height: 1.5;
+    }
+    .dashboard-link {
+        color: #ff5f6d;
+        transition: color 0.2s ease;
+    }
+    .dashboard-link:hover {
+        color: #ffc371;
+    }
+    .badge {
+        padding: 0.35rem 0.75rem;
+        font-weight: 600;
+        font-size: 0.75rem;
+        border-radius: 0.7rem;
+        background: #ff5f6d;
+    }
+    .dashboard-btn {
+        border-radius: 0.7rem;
+        font-weight: 500;
+        transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
+    }
+    .dashboard-btn:hover {
+        background: #ff5f6d;
+        color: #fff;
+        box-shadow: 0 0.5rem 1rem rgba(255,95,109,0.15);
+        transform: translateY(-2px);
+    }
+    @media (max-width: 991.98px) {
+        .dashboard-bg {
+            background: #fff;
+        }
+        .dashboard-title {
+            color: #212529;
+            text-shadow: none;
+        }
+        .dashboard-desc {
+            color: #6c757d!important;
+        }
+        .arrhythmia-timeline {
+            max-height: 500px;
+        }
+    }
+    @media (max-width: 767.98px) {
+        .dashboard-bg {
+            padding: 0 0.5rem;
+        }
+        .dashboard-title {
+            font-size: 2rem;
+        }
+        .dashboard-card {
+            padding: 0.5rem;
+        }
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+        }
+        .arrhythmia-timeline {
+            max-height: 400px;
+        }
+    }
+</style>
 
-new Vue({
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script>
+// Initialize age demographics chart
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        initAgeChart();
+    }, 500);
+});
+
+function initAgeChart() {
+    const canvas = document.getElementById('ageChart');
+    if (!canvas) {
+        console.log('Age chart canvas not found');
+        return;
+    }
     
+    const labels = {{ age_demographics.labels|safe }};
+    const data = {{ age_demographics.values|safe }};
+    
+    if (!labels || labels.length === 0) {
+        console.log('No age data');
+        return;
+    }
+    
+    console.log('Creating age chart with data:', labels, data);
+    
+    new Chart(canvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Number of Patients',
+                data: data,
+                backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                borderColor: 'rgba(102, 126, 234, 1)',
+                borderWidth: 2,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+}
+</script>
+
+<script>
+new Vue({
     delimiters: ["[[", "]]"],
     el: "#" + '{{ obj_name }}',
-    
     data: {
-
         loading_state: {},
         lists: {},
         url_models: {},
         endpoints: {},
-
         info: {
             'MESSAGE': '',
             'TITLE': 'Sample Title'
         },
-
         props: {},
-        state: {}
+        state: {},
+        currentTime: ''
     },
-
     mounted() {
-        
         if (document.querySelector("#" + '{{ obj_name }}')) {
             console.log("Mounted " + '{{ obj_name }}' + " page.")
         }
-
+        this.updateTime()
+        setInterval(this.updateTime, 60000) // Update every minute
         initializeModels(this, ['USER'])
         universalGet(this,
             'LIST_GET',
@@ -78,12 +621,25 @@ new Vue({
             'USER',
             {}, ''
         )
-
     },
-
-    methods: {},
+    methods: {
+        updateTime() {
+            const now = new Date()
+            const options = { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            }
+            this.currentTime = now.toLocaleDateString('en-US', options) + ' ' + 
+                               now.toLocaleTimeString('en-US', { 
+                                   hour: '2-digit', 
+                                   minute: '2-digit' 
+                               })
+        }
+    }
 });
-
 </script>
 
 {% endblock %}

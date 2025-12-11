@@ -1,0 +1,574 @@
+{% extends "app/layout.html" %}
+{% load static %}
+{% block content %}
+
+<div id="{{ obj_name }}">
+    {% include 'app/constants/universal_loading_modal.html' %}
+    <div class="row">
+
+        <div class="col-lg-12">
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="display-6 fw-bold">
+                        <i class="fa-solid fa-brain-circuit"></i> Patients
+                    </h1>
+
+                    <p class="lead fw-bold text-muted">
+                        Read ECG Data from patients using Arduino and AD8232
+                        Sensor
+                    </p>
+
+                    <p class="lead fw-bold">
+                        Cardiologist: {{ request.user.first_name }}
+                        {{ request.user.last_name }}
+                    </p>
+
+                    <label class="label mb-2">Available Ports: *</label>
+
+                    <select v-if="lists.PORTS" class="form-control mb-3"
+                        v-model="selected_port">
+                        <option v-for="port in lists.PORTS.available_ports">
+                            [[ port ]]
+                        </option>
+                    </select>
+
+                    <button class="btn btn-primary w-100 mb-2"
+                        @click="plotJS()">Read
+                        ECG
+                        Data
+                    </button>
+
+                    <div class="mb-3">
+                        <label for="formFile" class="form-label">Upload
+                            ECG Data Raw: *</label>
+                        <input class="form-control" v-model="fileUpload"
+                            type="file" id="fileInput">
+                    </div>
+
+                    <button class="btn btn-secondary w-100 mb-3"
+                        @click="plotJSRaw()">
+                        Upload ECG Data (Raw)
+                    </button>
+
+                    <!-- <button class="btn btn-primary w-100 mb-2"
+                        @click="testWS()">Test Web Socket
+                    </button> -->
+
+                </div>
+            </div>
+
+            <div class="row mt-2">
+                <div class="col-lg-4">
+                    <label class="label mb-2">First Name:</label>
+                    <input
+                        type="text"
+                        v-model="props.PATIENT.first_name"
+                        class="form-control mb-2"
+                        :disabled="state.SELECTED_PATIENT" />
+                </div>
+
+                <div class="col-lg-4">
+                    <label class="label mb-2">Middle Name:</label>
+                    <input
+                        type="text"
+                        v-model="props.PATIENT.middle_name"
+                        class="form-control mb-2"
+                        :disabled="state.SELECTED_PATIENT" />
+                </div>
+
+                <div class="col-lg-4">
+                    <label class="label mb-2">Last Name:</label>
+                    <input
+                        type="text"
+                        v-model="props.PATIENT.last_name"
+                        class="form-control mb-2"
+                        :disabled="state.SELECTED_PATIENT" />
+                </div>
+
+            </div>
+
+            <div class="col-lg-12">
+                <button class="btn btn-primary mb-2 mt-2"
+                    @click="filterPatient()">
+                    Search Patient(s) <i
+                        class="fa-solid fa-magnifying-glass"></i>
+                </button>
+                <button class="btn btn-danger mb-2 mt-2"
+                    @click="clearFilters()">
+                    Clear Filters <i class="fa-solid fa-trash"></i>
+                </button>
+
+            </div>
+
+            <div class="col-lg-12">
+                <hr class="my-4" />
+            </div>
+
+            <div class="table-responsive">
+                <div id="ecg-graph" style="width:100%;">
+
+                </div>
+            </div>
+
+            <div class="col-lg-12">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <div v-if="loading_state.PATIENT">
+                                {% include 'app/constants/loading.html' %}
+                            </div>
+                            <div v-else>
+                                <table class="table" v-if="lists.PATIENT">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Patient ID #</th>
+                                            <th scope="col">Name</th>
+                                            <th scope="col">Action(s)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr
+                                            v-for="patient in lists.PATIENT.results">
+                                            <th scope="row">[[ patient.id
+                                                ]]</th>
+                                            <td>
+                                                [[ patient.first_name ]] [[
+                                                patient.middle_name ]] [[
+                                                patient.last_name ]]
+                                            </td>
+                                            <td>
+                                                <button
+                                                    class="btn btn-warning"
+                                                    @click="selectPatient(patient)">
+                                                    Select Patient <i
+                                                        class="fa-solid fa-eye">
+                                                    </i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- Navigation Buttons -->
+                        <div v-if="lists.PATIENT"
+                            class="d-flex justify-content-end mt-2">
+                            <button
+                                class="btn btn-primary me-2"
+                                :disabled="lists.PATIENT.previous === null"
+                                @click="switchPage('PREVIOUS')">
+                                <i class="fa-solid fa-left"></i> Previous
+                            </button>
+                            <button
+                                class="btn btn-primary me-2"
+                                :disabled="lists.PATIENT.next === null"
+                                @click="switchPage('NEXT')">
+                                Next <i class="fa-solid fa-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+new Vue({
+    delimiters: ["[[", "]]"],
+    el: "#" + '{{ obj_name }}',
+    data: {
+        fileUpload: null,
+        selected_port: '',
+        loading_state: {},
+        lists: {},
+        url_models: {},
+        endpoints: {},
+
+        info: {
+            'MESSAGE': '',
+            'TITLE': 'Sample Title'
+        },
+
+        props: {
+            PATIENT: {
+                id: "",
+                first_name: "",
+                middle_name: "",
+                last_name: "",
+                birth: "",
+            },
+            PREDICTION: {
+                "id": ""
+            }
+        },
+
+        state: {
+            
+            SELECTED_PATIENT: false,
+            SELECTED_FILE: null,
+            COUNTER: 0,
+            X_VALUES: [],
+            Y_VALUES: []
+        }
+
+    },
+    mounted() {
+        if (document.querySelector("#" + '{{ obj_name }}')) {
+            console.log("Mounted " + '{{ obj_name }}' + " page.")
+        }
+
+        initializeModels(this, ["PATIENT"]);
+        universalGet(this, "LIST_GET", "PATIENT", "PATIENT", "PATIENT", {
+            page: 1,
+        });
+
+        this.getPorts()
+
+        Vue.set(this.lists, 'PORTS', [])
+        Vue.set(this.info, 'STATE', false)
+        Vue.set(this.props, 'PREDICTION', {})
+        
+        setInterval(() => {
+            this.state.COUNTER = this.state.COUNTER + 1
+        }, 3000)
+
+    },
+    methods: {
+
+        async selectPatient(prop) {
+            this.props.PATIENT = prop;
+            await universalGet(
+            this,
+            "LIST_GET",
+            "PATIENT",
+            "PATIENT",
+            "PATIENT",
+            this.getFilters()
+            );
+
+            this.state.SELECTED_PATIENT = true;
+        },
+
+        async clearFilters() {
+            this.info.TITLE = ''
+            this.info.MESSAGE = ''
+            this.props.PREDICTION = {
+                "id": ""
+            }
+            this.props.PATIENT = {
+            id: "",
+            first_name: "",
+            middle_name: "",
+            last_name: "",
+            birth: "",
+            };
+            await universalGet(
+            this,
+            "LIST_GET",
+            "PATIENT",
+            "PATIENT",
+            "PATIENT",
+            this.getFilters()
+            );
+            this.state.SELECTED_PATIENT = false;
+        },
+
+        async switchPage(option) {
+            var action = "";
+
+            if (option === "NEXT") {
+            action = this.lists.PATIENT.next;
+            } else if (option === "PREVIOUS") {
+            action = ensurePageParam(this.lists.PATIENT.previous);
+            }
+
+            await universalGet(
+            this,
+            "LIST_GET",
+            "PATIENT",
+            "PATIENT",
+            "PATIENT",
+            null,
+            action
+            );
+        },
+
+        async filterPatient() {
+            this.state.SELECTED_PATIENT = false;
+            await universalGet(
+            this,
+            "LIST_GET",
+            "PATIENT",
+            "PATIENT",
+            "PATIENT",
+            this.getFilters()
+            );
+            if (this.lists.PATIENT) {
+            if (this.lists.PATIENT.count < 1) {
+                this.info.MESSAGE = "Oh no! No results found.";
+                this.info.TITLE = "Notification";
+                openModal("message_modal");
+                this.clearFilters();
+            }
+            }
+        },
+
+        getFilters() {
+            const filters = { page: 1 };
+
+            if (this.props.PATIENT.first_name !== "") {
+            filters["first_name"] = this.props.PATIENT.first_name;
+            }
+
+            if (
+            this.props.PATIENT.middle_name !== "" &&
+            this.props.PATIENT.middle_name !== null
+            ) {
+            filters["middle_name"] = this.props.PATIENT.middle_name;
+            }
+
+            if (this.props.PATIENT.last_name !== "") {
+            filters["last_name"] = this.props.PATIENT.last_name;
+            }
+
+            console.log(filters);
+            return filters;
+        },
+
+        async predictECGData(rates) {
+            axios.defaults.headers.common['X-CSRFToken'] = getCookie('csrftoken')
+            let response = await axios.patch('/api/serial-ports/', {"rates": rates, "prediction_id": this.props.PREDICTION.id});
+            return response
+        },
+
+        async getPorts() {
+
+            try {
+                const url = '/api/serial-ports/'
+                const result = await axios.get(url)
+                if (result) {
+                    Vue.set(this.lists, 'PORTS', result.data)
+                }
+            } catch (error) {}
+
+        },
+        
+        async testWS() {
+            // Vue Way
+            // Initialize Websocket
+            const ws = new WebSocket("ws://localhost:8080/ws/some_path/");
+
+            // Timeout variable
+            let closeTimeout;
+
+            // Function to reset the timeout
+            const resetTimeout = () => {
+                if (closeTimeout) clearTimeout(closeTimeout);
+                closeTimeout = setTimeout(() => {
+                    console.log("⌛ No messages received in 10 seconds. Closing WebSocket.");
+                    ws.close();
+                }, 10000); // 10 seconds
+            };
+
+            ws.onopen = () => {
+                console.log("✅ WebSocket connected!");
+                resetTimeout(); // start the timeout on connection
+            };
+
+            ws.onmessage = (event) => {
+                resetTimeout();
+
+                try {
+
+                    let data = JSON.parse(event.data);
+                    let value = parseInt(data.message);
+                    this.state.Y_VALUES.push(value)
+                    this.state.COUNTER = this.state.COUNTER + 1
+                    this.state.X_VALUES.push(this.state.COUNTER)
+
+                    let trace = {
+
+                        x: this.state.X_VALUES,
+                        y: this.state.Y_VALUES,
+
+                        mode: 'lines',
+                        line: { color: 'blue' }
+                    };
+
+                    let layout = {
+                        title: 'ECG-Style Graph',
+                        xaxis: { title: 'Time' },
+                        yaxis: { title: 'Amplitude' }
+                    };
+
+                    if (this.state.COUNTER > 50) {
+                        this.state.COUNTER = 0
+                        this.state.X_VALUES = []
+                        this.state.Y_VALUES = []
+                    }
+
+                    Plotly.newPlot('chart-graph', [trace], layout);
+
+                } catch (e) {
+                    console.error("⚠️ Invalid WS message:", event.data, e);
+                }
+
+            };
+
+            ws.onclose = () => {
+                console.log("❌ WebSocket disconnected!");
+                this.info.STATE = false
+                closeModal('loading_message_modal')
+            };
+
+        },
+
+
+        async plotJSRaw() {
+
+
+
+            try {
+
+                // Do First Reading
+
+                const csrftoken = getCookie("csrftoken");
+                axios.defaults.headers.common["X-CSRFToken"] = csrftoken;
+
+                const form_data = new FormData();
+                
+                // Append the selected file to the FormData object
+                const fileInput = document.getElementById('fileInput'); // Assuming you have an input element with id 'fileInput'
+                const file = fileInput.files[0]; // Get the first file selected by the user
+                form_data.append('file', file);
+            
+                const url = "/api/upload-csv/"
+                const reading_result = await axios.post(url, form_data)
+
+                console.log(reading_result.data.data)
+            
+                fileInput.files[0] = null
+
+                this.info.STATE = true
+                this.info.TITLE = 'Notification'
+                this.info.MESSAGE = 'Reading ECG Data'
+                
+                openModal('loading_message_modal')
+
+                axios.defaults.headers.common['X-CSRFToken'] = getCookie('csrftoken')
+
+                const payload = {
+                    "port": null,
+                    "patient": this.props.PATIENT.id,
+                    "raw": true,
+                    "heart_rates": reading_result.data.data
+                }
+
+                let response = await axios.post('/api/serial-ports/', payload);
+                let data = response.data;
+                
+                this.props.PREDICTION.id = response.data.prediction_id
+
+                let xValues = [...Array(data.rates.length).keys()];
+                let yValues = data.rates;
+                
+                this.info.MESSAGE = 'Predicting Fetched Data using GRU'
+                const prediction = await this.predictECGData(data.rates)
+        
+                if (prediction) {
+                    this.info.MESSAGE = prediction.data.message
+                }
+
+                let trace = {
+                    x: xValues,
+                    y: yValues,
+                    mode: 'lines',
+                    line: { color: 'blue' }
+                };
+
+                let layout = {
+                    title: 'ECG-Style Graph',
+                    xaxis: { title: 'Time' },
+                    yaxis: { title: 'Amplitude' }
+                };
+
+                Plotly.newPlot('ecg-graph', [trace], layout);
+
+            } catch (error) {
+                console.error("Error fetching ECG data:", error);
+            }
+
+            this.info.STATE = false
+            this.info.TITLE = 'Notification'
+            
+        },
+
+        async plotJS() {
+
+            try {
+
+                this.info.STATE = true
+                this.info.TITLE = 'Notification'
+                this.info.MESSAGE = 'Reading ECG Data'
+                
+                openModal('loading_message_modal')
+                await this.testWS()
+
+                axios.defaults.headers.common['X-CSRFToken'] = getCookie('csrftoken')
+
+                const payload = {
+                    "port": this.selected_port,
+                    "patient": this.props.PATIENT.id
+                }
+
+                let response = await axios.post('/api/serial-ports/', payload);
+                let data = response.data;
+
+                console.log(data)
+                console.log('is the response.')
+
+                this.props.PREDICTION.id = response.data.prediction_id
+
+                let xValues = [...Array(data.rates.length).keys()];
+                let yValues = data.rates;
+                
+                this.info.MESSAGE = 'Predicting Fetched Data using GRU'
+                const prediction = await this.predictECGData(data.rates)
+        
+                if (prediction) {
+                    this.info.MESSAGE = prediction.data.message
+                }
+
+                let trace = {
+                    x: xValues,
+                    y: yValues,
+                    mode: 'lines',
+                    line: { color: 'blue' }
+                };
+
+                let layout = {
+                    title: 'ECG-Style Graph',
+                    xaxis: { title: 'Time' },
+                    yaxis: { title: 'Amplitude' }
+                };
+
+                Plotly.newPlot('ecg-graph', [trace], layout);
+
+            } catch (error) {
+                console.error("Error fetching ECG data:", error);
+            }
+
+            this.info.STATE = false
+            this.info.TITLE = 'Notification'
+            
+        }
+    },
+});
+</script>
+{% endblock %}

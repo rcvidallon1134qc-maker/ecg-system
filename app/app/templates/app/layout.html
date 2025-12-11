@@ -4,7 +4,7 @@
 
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{{ title }} - My Django Application</title>
+        <title>{{ title }} - CardioNet</title>
 
         {% load static %}
         <link rel="icon" href="{% static 'app/favicon.ico' %}"
@@ -38,19 +38,20 @@
 
     <body>
 
-        <div class="container mt-4" style="padding-top: 100px">
-
-            {% if user.is_authenticated %}
-
+        <style>
+            body {
+                background: linear-gradient(135deg, #f8fafc 0%, #e0e7ef 100%) !important;
+                min-height: 100vh;
+                min-width: 100vw;
+                width: 100vw;
+                height: 100vh;
+                overflow-x: hidden;
+            }
+        </style>
+        {% if user.is_authenticated %}
             {% include 'app/partials/navbar.html' %}
-
-            {% endif %}
-
-            {% block content %}
-
-            {% endblock %}
-
-        </div>
+        {% endif %}
+        {% block content %}{% endblock %}
 
         {% block scripts %}
 

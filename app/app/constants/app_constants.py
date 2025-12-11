@@ -2,8 +2,8 @@ from app.logs.logging import Levels, LogTypes
 
 #App Related
 APP_NAME = "app"
-SOFTWARE_NAME = "App Name"
-SOFTWARE_DESCRIPTION = "App Description"
+SOFTWARE_NAME = "CardioNet"
+SOFTWARE_DESCRIPTION = "GRU-Based Cardiac Arrhythmia Detection System"
 
 #Database Related
 EXCEPT_MODELS = [

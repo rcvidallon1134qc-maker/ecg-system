@@ -1,78 +1,145 @@
-<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar"
+<div class="offcanvas offcanvas-start custom-sidebar" tabindex="-1" id="offcanvasNavbar"
     aria-labelledby="offcanvasNavbarLabel">
-    <div class="offcanvas-header">
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"
+    <div class="offcanvas-header border-0 pb-0">
+        <div class="sidebar-logo d-flex align-items-center mx-auto mb-2">
+            <svg width="36" height="36" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="heartGradientSidebar" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#ff5f6d"/>
+                        <stop offset="1" stop-color="#ffc371"/>
+                    </linearGradient>
+                </defs>
+                <path d="M32 58s-1.7-1.5-4.6-4.1C14.2 41.2 4 32.7 4 22.5 4 13.6 11.6 6 20.5 6c4.7 0 9.1 2.2 11.5 5.7C34.4 8.2 38.8 6 43.5 6 52.4 6 60 13.6 60 22.5c0 10.2-10.2 18.7-23.4 31.4C33.7 56.5 32 58 32 58z" fill="url(#heartGradientSidebar)" stroke="#ff5f6d" stroke-width="2"/>
+            </svg>
+            <span class="sidebar-logo-title ms-2 fw-bold">CardioNet</span>
+        </div>
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="offcanvas"
             aria-label="Close"></button>
     </div>
-    <div class="offcanvas-body">
-
-        <div class="text-center">
-            <h1 class="display-3"><i class="fa-solid fa-circle-user"></i></h1>
-            <p class="lead">Welcome, {{ request.user }}!</p>
+    <div class="offcanvas-body px-3 py-2">
+        <div class="text-center mb-4">
+            <div class="sidebar-avatar mb-2">
+                <i class="fa-solid fa-circle-user"></i>
+            </div>
+            <p class="lead mb-0 sidebar-welcome">Welcome, <span class="fw-bold">{{ request.user }}</span>!</p>
         </div>
-
-        <ul class="navbar-nav">
-
-            <li class="nav-item">
-                <a class="nav-link fw-normal text-muted"
-                    href="{% url 'home' %}">
-                    <i class="fa-solid fa-house p-3"></i>Home
+        <ul class="navbar-nav sidebar-nav">
+            <li class="nav-item mb-2">
+                <a class="nav-link sidebar-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">
+                    <i class="fa-solid fa-house me-2"></i>Home
                 </a>
             </li>
-
             {% if request.user.is_superuser %}
-            <li class="nav-item">
-                <a class="nav-link fw-normal text-muted"
-                    href="{% url 'datasets' %}">
-                    <i class="fa-solid fa-database p-3"></i>Datasets
+            <li class="nav-item mb-2">
+                <a class="nav-link sidebar-link {% if request.resolver_match.url_name == 'datasets' %}active{% endif %}" href="{% url 'datasets' %}">
+                    <i class="fa-solid fa-database me-2"></i>Datasets
                 </a>
             </li>
             {% endif %}
-
             {% if not request.user.is_superuser %}
-            <li class="nav-item">
-                <a class="nav-link fw-normal text-muted"
-                    href="{% url 'cardiologist' %}">
-                    <i class="fa-solid fa-heart p-3"></i>Read ECG
+            <li class="nav-item mb-2">
+                <a class="nav-link sidebar-link {% if request.resolver_match.url_name == 'cardiologist' %}active{% endif %}" href="{% url 'cardiologist' %}">
+                    <i class="fa-solid fa-heart me-2"></i>Read ECG
                 </a>
             </li>
             {% endif %}
-
             {% if not request.user.is_superuser %}
-            <li class="nav-item">
-                <a class="nav-link fw-normal text-muted"
-                    href="{% url 'patients' %}">
-                    <i class="fa-solid fa-users-medical p-3"></i>Patients
+            <li class="nav-item mb-2">
+                <a class="nav-link sidebar-link {% if request.resolver_match.url_name == 'patients' %}active{% endif %}" href="{% url 'patients' %}">
+                    <i class="fa-solid fa-users-medical me-2"></i>Patients
                 </a>
             </li>
             {% endif %}
-
             {% if request.user.is_superuser %}
-            <li class="nav-item">
-                <a class="nav-link fw-normal text-muted"
-                    href="{% url 'administration' %}">
-                    <i class="fa-solid fa-user-tie p-3"></i>Admin Panel /
-                    User(s)
+            <li class="nav-item mb-2">
+                <a class="nav-link sidebar-link {% if request.resolver_match.url_name == 'administration' %}active{% endif %}" href="{% url 'administration' %}">
+                    <i class="fa-solid fa-user-tie me-2"></i>Admin Panel / User(s)
                 </a>
             </li>
             {% endif %}
-
             {% if not request.user.is_superuser %}
-            <li class="nav-item">
-                <a class="nav-link fw-normal text-muted"
-                    href="{% url 'cardios' %}">
-                    <i class="fa-solid fa-user-doctor p-3"></i>Cardiologist's
-                    Panel
+            <li class="nav-item mb-2">
+                <a class="nav-link sidebar-link {% if request.resolver_match.url_name == 'cardios' %}active{% endif %}" href="{% url 'cardios' %}">
+                    <i class="fa-solid fa-user-doctor me-2"></i>Cardiologist's Panel
                 </a>
             </li>
             {% endif %}
-
-            <li class="nav-item">
-                <a class="nav-link fw-normal text-muted"
-                    href="{% url 'logout' %}">
-                    <i class="fa-solid fa-right-from-bracket p-3"></i>Sign-out
+            <li class="nav-item mt-3">
+                <a class="nav-link sidebar-link text-danger" href="{% url 'logout' %}">
+                    <i class="fa-solid fa-right-from-bracket me-2"></i>Sign-out
                 </a>
             </li>
         </ul>
     </div>
 </div>
+<style>
+    .custom-sidebar {
+        background: linear-gradient(135deg, #f8fafc 0%, #e0e7ef 100%);
+        min-width: 250px;
+        max-width: 320px;
+        border-right: 1px solid #ffe3e3;
+        box-shadow: 2px 0 16px 0 rgba(255,95,109,0.07);
+    }
+    .sidebar-logo {
+        justify-content: center;
+        align-items: center;
+        gap: 0.3rem;
+    }
+    .sidebar-logo-title {
+        color: #2d3748;
+        font-size: 1.2rem;
+        letter-spacing: 1px;
+        text-shadow: 1px 2px 8px rgba(255,95,109,0.08);
+    }
+    .sidebar-avatar {
+        font-size: 3rem;
+        color: #ff5f6d;
+        filter: drop-shadow(0 2px 8px rgba(255,95,109,0.10));
+    }
+    .sidebar-welcome {
+        color: #2d3748;
+        font-size: 1.1rem;
+    }
+    .sidebar-nav {
+        margin-top: 1.5rem;
+    }
+    .sidebar-link {
+        color: #2d3748;
+        font-weight: 500;
+        border-radius: 0.6rem;
+        padding: 0.7rem 1rem;
+        transition: background 0.2s, color 0.2s;
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+    }
+    .sidebar-link:hover, .sidebar-link.active {
+        background: linear-gradient(90deg, #ff5f6d 0%, #ffc371 100%);
+        color: #fff !important;
+    }
+    .sidebar-link i {
+        font-size: 1.2rem;
+    }
+    @media (max-width: 991.98px) {
+        .custom-sidebar {
+            min-width: 200px;
+            max-width: 90vw;
+        }
+        .sidebar-avatar {
+            font-size: 2.2rem;
+        }
+        .sidebar-logo-title {
+            font-size: 1rem;
+        }
+    }
+    @media (max-width: 575.98px) {
+        .custom-sidebar {
+            min-width: 140px;
+            max-width: 100vw;
+        }
+        .sidebar-link {
+            font-size: 0.95rem;
+            padding: 0.6rem 0.7rem;
+        }
+    }
+</style>

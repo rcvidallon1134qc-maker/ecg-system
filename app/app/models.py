@@ -65,6 +65,7 @@ class Patient(models.Model):
     middle_name = models.CharField(max_length=255, null = True, default = None)
     last_name = models.CharField(max_length=255, null = False)
     birth = models.DateField(default = None)
+    age = models.IntegerField(null=True, blank=True, help_text="Patient's age in years")
 
     def __str__(self):
         return f'{self.first_name} {self.middle_name} {self.last_name}'
@@ -85,6 +86,11 @@ class Prediction(models.Model):
     sequential_ecg = models.TextField(default = None, null = False)
     remarks = models.TextField(default = None, null = False)
     recommendations = models.TextField(default = None, null = True)
+    arrhythmia_type = models.CharField(max_length=255, null=True, blank=True, help_text="Type of arrhythmia detected")
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+
+    def __str__(self):
+        return f'Prediction for {self.patient} - {self.arrhythmia_type or "Unknown"}'
 
 class ModelInfo(models.Model):
 
