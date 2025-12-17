@@ -78,6 +78,7 @@ requests
 pandas
 matplotlib
 itsdangerous==2.1.2
+pyserial
 
 
 
