@@ -4,7 +4,7 @@ import requests
 import json
 
 # === CONFIGURATION ===
-SERIAL_PORT = 'COM3'  # Change to your Arduino port
+SERIAL_PORT = 'COM5'  # Change to your Arduino port
 BAUD_RATE = 9600
 FIREBASE_URL = 'https://YOUR_PROJECT_ID.firebaseio.com/ecg.json'  # Replace with your Firebase Realtime Database URL
 
