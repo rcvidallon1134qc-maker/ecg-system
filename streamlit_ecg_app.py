@@ -87,7 +87,5 @@ if st.session_state.running:
             ser.close()
         except Exception as e:
             st.error(f"Serial error: {e}")
-    except Exception as e:
-        st.error(f"Error: {e}")
-else:
-    st.info("Click 'Start Monitoring' to begin.")
+    else:
+        st.info("Click 'Start Monitoring' to begin.")
