@@ -189,4 +189,3 @@ whitenoise==6.6.0
 wrapt==1.16.0
 zipp==3.16.2
 zope.interface==6.0
-pip==25.3
