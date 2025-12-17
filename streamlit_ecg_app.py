@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import os
 try:
     import serial
+    import serial.tools.list_ports
     SERIAL_AVAILABLE = True
 except ImportError:
     SERIAL_AVAILABLE = False
@@ -14,8 +15,19 @@ except ImportError:
 # Streamlit app title
 st.title("Real-Time ECG Monitoring (Arduino AD8232)")
 
+
 # Serial port configuration
-SERIAL_PORT = st.text_input("Enter Serial Port (e.g., COM3 or /dev/ttyUSB0):", "COM3")
+def get_serial_ports():
+    if SERIAL_AVAILABLE:
+        ports = serial.tools.list_ports.comports()
+        return [port.device for port in ports]
+    return []
+
+available_ports = get_serial_ports()
+if available_ports:
+    SERIAL_PORT = st.selectbox("Select Serial Port:", available_ports)
+else:
+    SERIAL_PORT = st.text_input("Enter Serial Port (e.g., COM3 or /dev/ttyUSB0):", "COM3")
 BAUD_RATE = 9600
 
 # Number of data points to display
