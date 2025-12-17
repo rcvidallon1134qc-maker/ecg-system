@@ -24,15 +24,15 @@ def get_serial_ports():
     return []
 
 available_ports = get_serial_ports()
-    default_port = "COM5"
-    if available_ports:
-        # If COM5 is available, set it as the default selection
-        default_index = 0
-        if default_port in available_ports:
-            default_index = available_ports.index(default_port)
-        SERIAL_PORT = st.selectbox("Select Serial Port:", available_ports, index=default_index)
-    else:
-        SERIAL_PORT = st.text_input("Enter Serial Port (e.g., COM3 or /dev/ttyUSB0):", default_port)
+default_port = "COM5"
+if available_ports:
+    # If COM5 is available, set it as the default selection
+    default_index = 0
+    if default_port in available_ports:
+        default_index = available_ports.index(default_port)
+    SERIAL_PORT = st.selectbox("Select Serial Port:", available_ports, index=default_index)
+else:
+    SERIAL_PORT = st.text_input("Enter Serial Port (e.g., COM3 or /dev/ttyUSB0):", default_port)
 BAUD_RATE = 9600
 
 # Number of data points to display
